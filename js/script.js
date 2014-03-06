@@ -1,11 +1,11 @@
 (function () {
-var m = L.map('mapID').setView([42.36, -71.06], 15);
+var m = L.map('mapID').setView([41, -87], 15);
 var baseMaps = [
-    "Stamen.Watercolor",
-	"OpenStreetMap.Mapnik",
-	"OpenStreetMap.DE",
-	"Esri.WorldImagery",
-	"MapQuestOpen.OSM"
+    "Stamen.Watercolor"
+	//"OpenStreetMap.Mapnik",
+	//"OpenStreetMap.DE",
+	//"Esri.WorldImagery",
+	//"MapQuestOpen.OSM"
 ];
 var lc = L.control.layers.provided(baseMaps,{},{collapsed:false}).addTo(m);
 m.addHash({lc:lc});
@@ -20,10 +20,10 @@ var data={}, layers={}, fills =[
 	"rgb(127,188,65)",
 	"rgb(69, 117, 180)"
 ];
-d3.json("json/oa.json", dealwithData);
+d3.json("json/divvy_stations_2013.json", dealwithData);
 function dealwithData(oa){
-	data.json= oa.features.map(function(v){
-        return [v.geometry.coordinates[1],v.geometry.coordinates[0]];
+	data.json= oa.stations.map(function(v){
+        return [v.latitude,v.longitude];
 	});
     points();
     veronoi();

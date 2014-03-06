@@ -1,8 +1,12 @@
 {
 "type": "FeatureCollection",
 "features": [
-{ "type": "Feature", "id": 0, "properties": { "Name": "00175a", "Description": "<div class=\"oainfo\"> <dl> <dt>Permit Numbers<\/dt><dd>00175a<\/dd> <dt>Permit Holder<\/dt><dd>Lamar Pittsfield Outdoor, Inc<\/dd> <dt>Sign Type<\/dt><dd>Traditional Display<\/dd> <dt>Facing<\/dt><dd>Rt 7<\/dd> <dt>Municipality<\/dt><dd>Pittsfield<\/dd> <\/dl> <\/div>" }, "geometry": { "type": "Point", "coordinates": [ -73.250854, 42.456242, 0.000000 ] } }
-,
+{ 	
+	"type": "Feature", 
+	"id": 0, 
+	"properties": { "Name": "00175a", "Description": "<div class=\"oainfo\"> <dl> <dt>Permit Numbers<\/dt><dd>00175a<\/dd> <dt>Permit Holder<\/dt><dd>Lamar Pittsfield Outdoor, Inc<\/dd> <dt>Sign Type<\/dt><dd>Traditional Display<\/dd> <dt>Facing<\/dt><dd>Rt 7<\/dd> <dt>Municipality<\/dt><dd>Pittsfield<\/dd> <\/dl> <\/div>" }, 
+	"geometry": { "type": "Point", "coordinates": [ -73.250854, 42.456242, 0.000000 ] } 
+},
 { "type": "Feature", "id": 1, "properties": { "Name": "00220a", "Description": "<div class=\"oainfo\"> <dl> <dt>Permit Numbers<\/dt><dd>00220a<\/dd> <dt>Permit Holder<\/dt><dd>Lamar Pittsfield Outdoor, Inc<\/dd> <dt>Sign Type<\/dt><dd>Traditional Display<\/dd> <dt>Facing<\/dt><dd>Rt 8A<\/dd> <dt>Municipality<\/dt><dd>North Adams<\/dd> <\/dl> <\/div>" }, "geometry": { "type": "Point", "coordinates": [ -73.103973, 42.687164, 0.000000 ] } }
 ,
 { "type": "Feature", "id": 2, "properties": { "Name": "01111 and 02222", "Description": "<div class=\"oainfo\"> <dl> <dt>Permit Numbers<\/dt><dd>01111 and 02222<\/dd> <dt>Permit Holder<\/dt><dd>Lamar Central Outdoor, LLC<\/dd> <dt>Sign Type<\/dt><dd>Traditional Display<\/dd> <dt>Facing<\/dt><dd>Rt 291<\/dd> <dt>Municipality<\/dt><dd>Springfield<\/dd> <\/dl> <\/div>" }, "geometry": { "type": "Point", "coordinates": [ -72.589890, 42.116100, 0.000000 ] } }
