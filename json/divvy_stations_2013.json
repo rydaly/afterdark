@@ -1,6 +1,6 @@
 {
 "type": "FeatureCollection",
-"stations": [
+"features": [
   {
     "id":5,
     "name":"State St & Harrison St",
