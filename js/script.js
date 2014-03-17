@@ -1,3 +1,25 @@
+/*
+    TODO :: 
+
+    * abstract pulse functions so they can be called whenever
+        function pulse(latlng) {
+    
+        }
+    * organize data based on start time
+    * abstract line drawing so we can make calls whenever
+        function drawLine(startPoint, endPoint, duration) {
+    
+        }
+    * create up-front splash page that will initialize the app based on a date selected from a calendar
+    * Switch AM / PM on clock 
+    * create a scrubbable timeline that corresponds to clock
+    * stations need to start with 0 radius and grow according to data
+        - two rings - one to represent incoming bikes and one to represent outgoing
+        - these rings dynamically update as the timeline progresses
+    * stop clock after 24 hours and give option to reset or select another day. 
+*/
+
+
 var D3LMap = (function(){
     'use strict';
     //var createMap = function(){}; // read data and setup all aspects of map
@@ -29,7 +51,8 @@ var D3LMap = (function(){
         /* pick up the SVG from the map object */
         svg = d3.select("#map").select("svg"),
         g = svg.append("g").attr("class", "leaflet-zoom-hide"),
-        g2 = svg.append("g").attr("class", "leaflet-zoom-hide");
+        g2 = svg.append("g").attr("class", "leaflet-zoom-hide"),
+        renderTime = undefined;
     
     d3.json("json/divvy_stations_2013.json", function(collection) {
         /* Add a LatLng object to each item in the dataset */
@@ -170,6 +193,7 @@ var D3LMap = (function(){
 
         data.forEach(function(d, idx) {
             // console.log(data[idx].tripduration);
+            // push data into geo json object
             var strtLatLng = [data[idx].start_point.lng, data[idx].start_point.lat];
             var endLatLng = [data[idx].end_point.lng, data[idx].end_point.lat];
             var latLng = [strtLatLng, endLatLng];
@@ -253,4 +277,36 @@ var D3LMap = (function(){
     }
 });
 
-window.onload = D3LMap();
+function StopWatch(_hour, _min, _speed) {
+    var speed = _speed,
+        min = _min,
+        hour = _hour,
+        diem = "PM",
+        display = document.getElementById("clockDisplay"),
+
+        run = function() {
+            min++;
+        
+            if(min === 60) {
+                min = 0;
+                hour++;
+            } else {
+                hour = hour;
+            }
+            
+            if(hour === 13) { 
+                hour = 1; 
+            } else if(hour === 0) {
+                hour = 12;
+            }
+
+            display.innerText = ((hour < 10) ? " " + hour : hour) + " : " + ((min < 10) ? "0" + min : min) + " " + diem;
+        }
+
+        window.setInterval(run, speed);
+}
+
+window.onload = function() {
+    D3LMap();
+    var stopwatch = new StopWatch(0, 15, 100);
+}
