@@ -277,11 +277,13 @@ var D3LMap = (function(){
     }
 });
 
-function StopWatch(_hour, _min, _speed) {
+function StopWatch(_hour, _speed) {
     var speed = _speed,
-        min = _min,
+        min = 0,
         hour = _hour,
-        diem = "PM",
+        diem = "AM",
+        hourCount = 0,
+        interval = undefined,
         display = document.getElementById("clockDisplay"),
 
         run = function() {
@@ -290,23 +292,40 @@ function StopWatch(_hour, _min, _speed) {
             if(min === 60) {
                 min = 0;
                 hour++;
-            } else {
-                hour = hour;
+                hourCount++;
+                console.log(hourCount);
+            } 
+            // else {
+            //     hour = hour;
+            // }
+            if(hour === 0) {
+                // start at midnight if 0 is passed
+                hour = 12;
+                diem = "AM";
             }
             
-            if(hour === 13) { 
-                hour = 1; 
-            } else if(hour === 0) {
-                hour = 12;
+            if(hour === 12 && min === 0 && diem === "AM") {
+                diem = "PM";
+            }
+            else if(hour === 12 && min === 0 && diem === "PM") {
+                diem = "AM";
+            }
+            
+            if (hour === 13) {
+                hour = 1;
+            }
+
+            if(hourCount === 24) {
+                window.clearInterval(interval);
             }
 
             display.innerText = ((hour < 10) ? " " + hour : hour) + " : " + ((min < 10) ? "0" + min : min) + " " + diem;
         }
 
-        window.setInterval(run, speed);
+        interval = window.setInterval(run, speed);
 }
 
 window.onload = function() {
     D3LMap();
-    var stopwatch = new StopWatch(0, 15, 100);
+    var stopwatch = new StopWatch(5, 1);
 }
