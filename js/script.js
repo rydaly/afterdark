@@ -38,11 +38,16 @@ var D3LMap = (function(){
             // store station id with lat & long
             stations[d.id] = d.LatLng;
         });
-        var feature = g.selectAll("circle").data(collection.features).enter().append("circle").attr("r", function(d) {
-            return circsize;
-        }).attr('fill', 'coral').attr("id", function(d) {
-            return "s_" + d.id;
-        });
+        var feature = g.selectAll("circle")
+            .data(collection.features)
+            .enter().append("circle")
+            .attr("r", function(d) {
+                return circsize;
+            })
+            .attr('fill', 'coral')
+            .attr("id", function(d) {
+                return "s_" + d.id;
+            });
 
         function update() {
             feature.attr("cx", function(d) {
@@ -157,18 +162,22 @@ var D3LMap = (function(){
                     'coordinates': []
                 },
                 'properties': {
-                    'unique_ids': []
+                    'unique_ids': [],
+                    'trip_durations': []
                 }
             }]
         };
 
         data.forEach(function(d, idx) {
+            // console.log(data[idx].tripduration);
             var strtLatLng = [data[idx].start_point.lng, data[idx].start_point.lat];
             var endLatLng = [data[idx].end_point.lng, data[idx].end_point.lat];
             var latLng = [strtLatLng, endLatLng];
             var uniqueID = data[idx].unique_id;
+            var tripduration = data[idx].tripduration;
             geojson.features[0].geometry.coordinates.push(latLng);
             geojson.features[0].properties.unique_ids.push(uniqueID);
+            geojson.features[0].properties.trip_durations.push(tripduration * 5);
         });
         // var myStyle = {
         //     "color": "#ff7800",
@@ -205,9 +214,11 @@ var D3LMap = (function(){
                 .attr("fill", "none")
                 .attr("stroke-dasharray", totalDistance + " " + totalDistance)
                 .attr("stroke-dashoffset", totalDistance)
-                .transition().delay(3000)
+                .transition()
+                .delay(Math.random() * 5000 + 1000)
                 .duration(function() {
-                    return Math.random() * 6000 + 1000;
+                    //return Math.random() * 10000 + 5000;
+                    return collection.features[0].properties.trip_durations[idx]
                 })
                 //.ease("linear")
                 .attr("stroke-dashoffset", 0).attr("style", function() {
@@ -240,4 +251,6 @@ var D3LMap = (function(){
         //     this.stream.point(point.x, point.y);
         // }
     }
-}());
+});
+
+window.onload = D3LMap();
