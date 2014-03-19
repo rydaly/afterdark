@@ -17,17 +17,12 @@
         - two rings - one to represent incoming bikes and one to represent outgoing
         - these rings dynamically update as the timeline progresses
     * stop clock after 24 hours and give option to reset or select another day. 
+    * fade out trip path after the animation is complete
 */
 
 'use strict';
 
 var D3LMap = {
-    //var createMap = function(){}; // read data and setup all aspects of map
-    //var incomingPulse = function(LatLng){};
-    //var outgoingPulse = function(LatLng){};
-    //var animatePath = function(path){};
-    // }
-
     // vars for leaflet map
     map: undefined,
     toner: undefined,
@@ -36,7 +31,7 @@ var D3LMap = {
     vector: undefined,
 
     // vars for data
-    divvy_trips_json: "json/divvy_trips_sample_sm.json",
+    divvy_trips_json: "json/divvy_trips_sample.json",
     geojson: {},
     stations: {},
 
@@ -46,8 +41,10 @@ var D3LMap = {
     g2: undefined,
     circsize: 1,
 
-    // var for ui
+    // vars for day timer and ui 
     timer: undefined,
+    dayStartTime: 5,
+    timerSpeed: 10,
 
     initMap: function() {
         D3LMap.toner = new L.TileLayer(D3LMap.tonerUrl, {
@@ -82,9 +79,11 @@ var D3LMap = {
                 },
                 'properties': {
                     'unique_ids': [],
+                    'start_times': [],
                     'trip_durations': [],
                     'targ_circ_start': [],
-                    'targ_circ_end': []
+                    'targ_circ_end': [],
+                    'start_delays': []
                 }
             }]
         };
@@ -92,12 +91,14 @@ var D3LMap = {
         D3LMap.drawAnimatedMarkers();
         D3LMap.drawCountMarkers();
 
+        D3LMap.divvyTimer.init(D3LMap.dayStartTime, D3LMap.timerSpeed);
+
         // replace this with a callback later... will load when user selects day
         setTimeout(startAnimation, 2500);
 
         function startAnimation() {
             D3LMap.initTripPaths();
-            D3LMap.divvyTimer(5, 10)
+            D3LMap.divvyTimer.start();
         }
     },
     
@@ -220,14 +221,18 @@ var D3LMap = {
                     targEnd = data[idx].targ_circ_end,
                     latLng = [strtLatLng, endLatLng],
                     uniqueID = data[idx].unique_id,
-                    tripduration = data[idx].tripduration;
+                    tripduration = data[idx].tripduration,
+                    startTime = data[idx].starttime.split(" ").pop(), // pop just the time off the end
+                    startDelay = D3LMap.calcTimeDiff(startTime, D3LMap.dayStartTime.toString() + ":00") * 1000;
                 
                 // push data into geo json object
                 D3LMap.geojson.features[0].geometry.coordinates.push(latLng);
                 D3LMap.geojson.features[0].properties.unique_ids.push(uniqueID);
-                D3LMap.geojson.features[0].properties.trip_durations.push(tripduration * 10);
+                D3LMap.geojson.features[0].properties.trip_durations.push(tripduration);
                 D3LMap.geojson.features[0].properties.targ_circ_start.push(targStart);
                 D3LMap.geojson.features[0].properties.targ_circ_end.push(targEnd);
+                D3LMap.geojson.features[0].properties.start_times.push(startTime);
+                D3LMap.geojson.features[0].properties.start_delays.push(startDelay);
             });
             
             // add lines to leaflet layer
@@ -249,7 +254,9 @@ var D3LMap = {
                 end_circ = data.features[0].properties.targ_circ_end[idx],
                 totalDistance = L.GeometryUtil.length([start_latlng, end_latlng]),
                 theNode = d3.select(this).node(),
-                duration = data.features[0].properties.trip_durations[idx];
+                actualDuration = data.features[0].properties.trip_durations[idx],
+                startTime = data.features[0].properties.start_times[idx],
+                actualDelay = data.features[0].properties.start_delays[idx];
             
             //console.log(totalDistance);
             
@@ -263,22 +270,34 @@ var D3LMap = {
                 .attr("stroke-dasharray", totalDistance + " " + totalDistance)
                 .attr("stroke-dashoffset", totalDistance)
                 .transition()
-                .delay(Math.random() * 5000 + 1000)
-                .duration(function() {
-                    return duration;
-                })
-                .ease("linear")
+                // .delay(function(d, i) { 
+                //     return actualDelay;
+                // })
+                .delay(actualDelay)
+                .duration(actualDuration)
+                // .duration(function(d, i) {
+                //     return duration; 
+                // })
+                .ease("cubic-in-out")
                 .attr("stroke-dashoffset", 0)
                 .attr("style", function() {
                     // return "stroke-dashoffset 5s ease-in-out; pointer-events:none;";
                     return "pointer-events:none;";
                 })
-                .each("start", function() {
+                .each("start", function(d) {
                     D3LMap.animatePulse(start_circ, "outgoing");
-                    setTimeout(D3LMap.animatePulse(end_circ, "incoming"), duration);
+                    // setTimeout(D3LMap.animatePulse(end_circ, "incoming"), duration);
                 })
                 .each("end", function(d) {
+                    // console.log(startTime);
                     D3LMap.animatePulse(end_circ, "incoming");
+                    d3.select(this)
+                        .transition()
+                        .delay(1000)
+                        .duration(2500)
+                        .ease('linear')
+                        .attr('stroke', 'black')
+                        .style("opacity", 0.0);
                 });
         });
     },
@@ -287,6 +306,7 @@ var D3LMap = {
         //console.log("target station ---->  " + target);
         switch(phase) {
             case "incoming" :
+                    //console.log('end');
                     target
                         .attr("stroke", "steelblue")
                         .attr("stroke-width", "2")
@@ -307,6 +327,7 @@ var D3LMap = {
                 break;
 
             case "outgoing" :
+                    //console.log('start');
                     target
                         .attr("stroke", "red")
                         .attr("stroke-width", "2")
@@ -333,47 +354,102 @@ var D3LMap = {
         return D3LMap.circsize / 1400 * Math.pow(2, D3LMap.map.getZoom());
     },
 
-    divvyTimer: function(_startHour, _speed) {
-        var speed = _speed,
-            min = 0,
-            hour = _startHour,
-            diem = "AM",
-            hourCount = 0,
-            interval = undefined,
-            display = document.getElementById("clockDisplay"),
+    calcTimeDiff: function(_start, _end) {
+        // console.log(_start, _end);
+        var start = _start,
+            end = _end,
+            hours = end.split(':')[0] - start.split(':')[0],
+            minutes = end.split(':')[1] - start.split(':')[1],
+            minFraction = 0,
+            conversion = 0;
 
-            run = function() {
-                min++;
-            
-                if(min === 60) {
-                    min = 0;
-                    hour++;
-                    hourCount++;
-                    // console.log(hourCount);
-                }
-                if(hour === 0) {
-                    // start at midnight if 0 is passed in for _startHour
-                    hour = 12;
-                    diem = "AM";
-                }
-                if(hour === 12 && min === 0 && diem === "AM") {
-                    diem = "PM";
-                }
-                else if(hour === 12 && min === 0 && diem === "PM") {
-                    diem = "AM";
-                }
-                if (hour === 13) {
-                    hour = 1;
-                }
-                if(hourCount === 24) {
-                    window.clearInterval(interval);
-                }
+            // console.log(hours, minutes);
+        
+        // minutes = minutes.toString().length < 2 ? '0' + minutes : minutes;
 
-                display.innerText = ((hour < 10) ? " " + hour : hour) + " : " + ((min < 10) ? "0" + min : min) + " " + diem;
-            }
-
-            interval = window.setInterval(run, speed);
+        if(minutes < 0) { 
+            hours--;
+            minutes = 60 + minutes;
         }
+        
+        // hours = hours.toString().length < 2 ? '0' + hours : hours;
+        
+        minFraction = minutes / 60;
+        conversion = hours + minFraction;
+        //console.log(hours + " :: " + fraction);
+        //console.log(conversion);
+        if(conversion < 0) {
+            // if negative, make positive
+            conversion = Math.abs(conversion); 
+        }
+        else
+        {
+            // offset numbers based on dayStartTime if positive
+            conversion = 24 - conversion;
+        }
+
+        return conversion;
+        // console.log(conversion);
+    },
+
+    divvyTimer: {
+        speed: 100,
+        min: 0,
+        hour: 0,
+        diem: "AM",
+        hourCount: 0,
+        interval: undefined,
+        node: document.getElementById("clockDisplay"),
+
+        init: function( _startHour, _speed ) {
+            this.hour = _startHour;
+            this.speed = _speed;
+            this.node.innerText = "00:00";
+        },
+
+        start: function() {
+            var that = this; // needs closure for proper scope
+            this.interval = setInterval(function() { that.run(); }, this.speed);
+        }, 
+
+        stop: function() {
+            // don't need for now
+        },
+
+        run: function() {
+            this.min++;
+            
+            if(this.min === 60) {
+                this.min = 0;
+                this.hour++;
+                this.hourCount++;
+                // console.log(hourCount);
+            }
+            if(this.hour === 0) {
+                // start at midnight if 0 is passed for start time
+                this.hour = 12;
+                this.diem = "AM";
+            }
+            if(this.hour === 12 && this.min === 0 && this.diem === "AM") {
+                this.diem = "PM";
+            }
+            else if(this.hour === 12 && this.min === 0 && this.diem === "PM") {
+                this.diem = "AM";
+            }
+            if (this.hour === 13) {
+                this.hour = 1;
+            }
+            if(this.hourCount === 24) {
+                clearInterval(this.interval);
+            }
+            //console.log(this);
+            this.node.innerText = ((this.hour < 10) ? " " + this.hour : this.hour) + ":" + ((this.min < 10) ? "0" + this.min : this.min) + " " + this.diem;
+        },
+
+        getCurrentTime: function() {
+            return ((this.hour < 10) ? " " + this.hour : this.hour) + ":" + ((this.min < 10) ? "0" + this.min : this.min);
+        }
+    }
 }
 
 window.onload = function() {
