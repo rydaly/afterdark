@@ -44,7 +44,7 @@ var D3LMap = {
     // vars for day timer and ui 
     timer: undefined,
     dayStartTime: 5,
-    timerSpeed: 10,
+    timerSpeed: 16.666666, // ( 24 seconds total - 1440 ticks total - 24000 ms / 1440 ticks = 16.6666 )
 
     initMap: function() {
         D3LMap.toner = new L.TileLayer(D3LMap.tonerUrl, {
@@ -53,7 +53,7 @@ var D3LMap = {
         }),
         D3LMap.map = new L.Map('map', {
             center: new L.LatLng(41.87395806, -87.62773949, 12),
-            zoom: 14,
+            zoom: 13,
             layers: [D3LMap.toner]
         });
 
@@ -92,12 +92,16 @@ var D3LMap = {
         D3LMap.drawCountMarkers();
 
         D3LMap.divvyTimer.init(D3LMap.dayStartTime, D3LMap.timerSpeed);
-
+        D3LMap.initTripPaths();
         // replace this with a callback later... will load when user selects day
-        setTimeout(startAnimation, 2500);
+        setTimeout(startAnimation, 5000);
 
         function startAnimation() {
-            D3LMap.initTripPaths();
+            // add lines to leaflet layer
+            L.geoJson(D3LMap.geojson).addTo(D3LMap.map);
+            // draw the paths
+            D3LMap.drawTripPaths(D3LMap.geojson);
+            // D3LMap.initTripPaths();
             D3LMap.divvyTimer.start();
         }
     },
@@ -234,12 +238,6 @@ var D3LMap = {
                 D3LMap.geojson.features[0].properties.start_times.push(startTime);
                 D3LMap.geojson.features[0].properties.start_delays.push(startDelay);
             });
-            
-            // add lines to leaflet layer
-            L.geoJson(D3LMap.geojson).addTo(D3LMap.map);
-            
-            // draw the paths
-            D3LMap.drawTripPaths(D3LMap.geojson);
         }
     },
 
@@ -286,6 +284,7 @@ var D3LMap = {
                 })
                 .each("start", function(d) {
                     D3LMap.animatePulse(start_circ, "outgoing");
+                    console.log('test :: ' + actualDelay);
                     // setTimeout(D3LMap.animatePulse(end_circ, "incoming"), duration);
                 })
                 .each("end", function(d) {
@@ -296,7 +295,7 @@ var D3LMap = {
                         .delay(1000)
                         .duration(2500)
                         .ease('linear')
-                        .attr('stroke', 'black')
+                        .attr('stroke', 'green')
                         .style("opacity", 0.0);
                 });
         });
@@ -423,7 +422,7 @@ var D3LMap = {
                 this.min = 0;
                 this.hour++;
                 this.hourCount++;
-                // console.log(hourCount);
+                console.log(this.hourCount);
             }
             if(this.hour === 0) {
                 // start at midnight if 0 is passed for start time
