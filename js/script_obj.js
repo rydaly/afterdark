@@ -103,6 +103,7 @@ var D3LMap = {
             D3LMap.drawTripPaths(D3LMap.geojson);
             // D3LMap.initTripPaths();
             D3LMap.divvyTimer.start();
+            // d3.timer(D3LMap.divvyTimer.run);
         }
     },
     
@@ -404,11 +405,13 @@ var D3LMap = {
             this.hour = _startHour;
             this.speed = _speed;
             this.node.innerText = "00:00";
+            console.log(this.node);
         },
 
         start: function() {
             var that = this; // needs closure for proper scope
-            this.interval = setInterval(function() { that.run(); }, this.speed);
+            this.interval = d3.timer(function() { that.run(); });
+            //this.interval = setInterval(function() { that.run(); }, this.speed);
         }, 
 
         stop: function() {
@@ -439,9 +442,11 @@ var D3LMap = {
                 this.hour = 1;
             }
             if(this.hourCount === 24) {
-                clearInterval(this.interval);
+                console.log('Y U NO stop timer!?');
+                return true;
+                // clearInterval(this.interval);
             }
-            //console.log(this);
+            // console.log(this);
             this.node.innerText = ((this.hour < 10) ? " " + this.hour : this.hour) + ":" + ((this.min < 10) ? "0" + this.min : this.min) + " " + this.diem;
         },
 
