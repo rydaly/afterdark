@@ -1,5 +1,5 @@
 /*
-    TODO :: 
+    TODO ::
 
     * abstract pulse functions so they can be called whenever
         function pulse(latlng) {
@@ -22,6 +22,9 @@
 
 'use strict';
 
+/* globals */
+var L, d3;
+
 var D3LMap = {
     // vars for leaflet map
     map: undefined,
@@ -43,14 +46,14 @@ var D3LMap = {
 
     // vars for day timer and ui 
     timer: undefined,
-    dayStartTime: 5,
-    timerSpeed: 16.666666, // ( 24 seconds total - 1440 ticks total - 24000 ms / 1440 ticks = 16.6666 )
+    dayStartTime: 0,
+    timerSpeed: 14.4, // ( 24000 ms total or 1440 ticks total ) 60 minutes / hour * 24 seconds = 1440 ticks total / 100;   
 
-    initMap: function() {
+    initMap: function () {
         D3LMap.toner = new L.TileLayer(D3LMap.tonerUrl, {
             maxZoom: 15,
             attribution: D3LMap.tonerAttribution
-        }),
+        });
         D3LMap.map = new L.Map('map', {
             center: new L.LatLng(41.87395806, -87.62773949, 12),
             zoom: 13,
@@ -61,12 +64,12 @@ var D3LMap = {
         D3LMap.map._initPathRoot();
 
         D3LMap.vector = L.geoJson().addTo(D3LMap.map);
-        
+
         /* pick up the SVG from the map object */
-        D3LMap.svg = d3.select("#map").select("svg"),
+        D3LMap.svg = d3.select("#map").select("svg");
         /* append two groups to hold two sets of station markers */
-        D3LMap.g = D3LMap.svg.append("g").attr("class", "leaflet-zoom-hide"),
-        D3LMap.g2 = D3LMap.svg.append("g").attr("class", "leaflet-zoom-hide"),
+        D3LMap.g = D3LMap.svg.append("g").attr("class", "leaflet-zoom-hide");
+        D3LMap.g2 = D3LMap.svg.append("g").attr("class", "leaflet-zoom-hide");
 
         /* geojson structure */
         D3LMap.geojson = {
@@ -93,10 +96,8 @@ var D3LMap = {
 
         D3LMap.divvyTimer.init(D3LMap.dayStartTime, D3LMap.timerSpeed);
         D3LMap.initTripPaths();
-        // replace this with a callback later... will load when user selects day
-        setTimeout(startAnimation, 5000);
 
-        function startAnimation() {
+        this.startAnimation = function () {
             // add lines to leaflet layer
             L.geoJson(D3LMap.geojson).addTo(D3LMap.map);
             // draw the paths
@@ -104,39 +105,42 @@ var D3LMap = {
             // D3LMap.initTripPaths();
             D3LMap.divvyTimer.start();
             // d3.timer(D3LMap.divvyTimer.run);
-        }
+        };
+
+        // replace this with a callback later... will load when user selects day
+        setTimeout(this.startAnimation, 5000);
     },
-    
-    drawAnimatedMarkers: function() {
-        d3.json("json/divvy_stations_2013.json", function(collection) {
+
+    drawAnimatedMarkers: function () {
+        d3.json("json/divvy_stations_2013.json", function (collection) {
             /* Add a LatLng object to each item in the dataset */
-            collection.features.forEach(function(d) {
+            collection.features.forEach(function (d) {
                 d.LatLng = new L.LatLng(d.latitude, d.longitude);
                 // store station id with lat & long
                 D3LMap.stations[d.id] = d.LatLng;
             });
-            
+
             var feature = D3LMap.g.selectAll("circle")
                 .data(collection.features)
                 .enter().append("circle")
-                .attr("r", function(d) {
+                .attr("r", function () {
                     return D3LMap.circsize;
                 })
                 .attr('fill', 'coral')
-                .attr("id", function(d) {
+                .attr("id", function (d) {
                     return "s_" + d.id; // assign a unique id so we can target for animation later
                 });
 
             function update() {
-                feature.attr("cx", function(d) {
-                    return D3LMap.map.latLngToLayerPoint(d.LatLng).x
-                })
-                feature.attr("cy", function(d) {
-                    return D3LMap.map.latLngToLayerPoint(d.LatLng).y
-                })
-                feature.attr("r", function(d) {
-                    return D3LMap.circsize / 1400 * Math.pow(2, D3LMap.map.getZoom())
-                })
+                feature.attr("cx", function (d) {
+                    return D3LMap.map.latLngToLayerPoint(d.LatLng).x;
+                });
+                feature.attr("cy", function (d) {
+                    return D3LMap.map.latLngToLayerPoint(d.LatLng).y;
+                });
+                feature.attr("r", function () {
+                    return D3LMap.circsize / 1400 * Math.pow(2, D3LMap.map.getZoom());
+                });
             }
 
             D3LMap.map.on("viewreset", update);
@@ -144,10 +148,10 @@ var D3LMap = {
         });
     },
 
-    drawCountMarkers: function() {
-        d3.json("json/divvy_stations_2013.json", function(collection) {
+    drawCountMarkers: function () {
+        d3.json("json/divvy_stations_2013.json", function (collection) {
             /* Add a LatLng object to each item in the dataset */
-            collection.features.forEach(function(d) {
+            collection.features.forEach(function (d) {
                 d.LatLng = new L.LatLng(d.latitude, d.longitude);
                 // store station id with lat & long
                 D3LMap.stations[d.id] = d.LatLng;
@@ -156,7 +160,7 @@ var D3LMap = {
                 .data(collection.features)
                 .enter()
                 .append("circle")
-                .attr("r", function(d) {
+                .attr("r", function () {
                     return D3LMap.circsize * 2;
                 })
                 .attr('fill', 'coral')
@@ -186,15 +190,15 @@ var D3LMap = {
             */
 
             function update() {
-                feature.attr("cx", function(d) {
-                    return D3LMap.map.latLngToLayerPoint(d.LatLng).x
-                })
-                feature.attr("cy", function(d) {
-                    return D3LMap.map.latLngToLayerPoint(d.LatLng).y
-                })
-                feature.attr("r", function(d) {
-                    return D3LMap.circsize / 1400 * Math.pow(2, D3LMap.map.getZoom())
-                })
+                feature.attr("cx", function (d) {
+                    return D3LMap.map.latLngToLayerPoint(d.LatLng).x;
+                });
+                feature.attr("cy", function (d) {
+                    return D3LMap.map.latLngToLayerPoint(d.LatLng).y;
+                });
+                feature.attr("r", function () {
+                    return D3LMap.circsize / 1400 * Math.pow(2, D3LMap.map.getZoom());
+                });
             }
 
             D3LMap.map.on("viewreset", update);
@@ -202,10 +206,10 @@ var D3LMap = {
         });
     },
 
-    initTripPaths: function() {
-        d3.json(D3LMap.divvy_trips_json, function(collection) {
+    initTripPaths: function () {
+        d3.json(D3LMap.divvy_trips_json, function (collection) {
             /* Add a LatLng object and unique id to each item in the dataset */
-            collection.features.forEach(function(d, idx) {
+            collection.features.forEach(function (d, idx) {
 
                 /* associate station id of trip with lat long of start and end stations */
                 d.start_point = new L.LatLng(D3LMap.stations[d.from_station_id].lat, D3LMap.stations[d.from_station_id].lng);
@@ -214,7 +218,7 @@ var D3LMap = {
                 d.targ_circ_start = d3.select("#s_" + d.from_station_id);
                 d.targ_circ_end = d3.select("#s_" + d.to_station_id);
             });
-            
+
             convertToGeojson(collection.features);
         });
 
@@ -229,7 +233,7 @@ var D3LMap = {
                     tripduration = data[idx].tripduration,
                     startTime = data[idx].starttime.split(" ").pop(), // pop just the time off the end
                     startDelay = D3LMap.calcTimeDiff(startTime, D3LMap.dayStartTime.toString() + ":00") * 1000;
-                
+
                 // push data into geo json object
                 D3LMap.geojson.features[0].geometry.coordinates.push(latLng);
                 D3LMap.geojson.features[0].properties.unique_ids.push(uniqueID);
@@ -242,25 +246,23 @@ var D3LMap = {
         }
     },
 
-    drawTripPaths: function(data) {
+    drawTripPaths: function (data) {
         var feature = d3.selectAll('path');
-        
-        feature.each(function(d, idx) {
+
+        feature.each(function (d, idx) {
             var theId = idx,
                 start_latlng = new L.LatLng(data.features[0].geometry.coordinates[idx][0][1], data.features[0].geometry.coordinates[idx][0][0]),
                 end_latlng = new L.LatLng(data.features[0].geometry.coordinates[idx][1][1], data.features[0].geometry.coordinates[idx][1][0]),
                 start_circ = data.features[0].properties.targ_circ_start[idx],
                 end_circ = data.features[0].properties.targ_circ_end[idx],
                 totalDistance = L.GeometryUtil.length([start_latlng, end_latlng]),
-                theNode = d3.select(this).node(),
+                // theNode = d3.select(this).node(),
                 actualDuration = data.features[0].properties.trip_durations[idx],
-                startTime = data.features[0].properties.start_times[idx],
+                // startTime = data.features[0].properties.start_times[idx],
                 actualDelay = data.features[0].properties.start_delays[idx];
-            
-            //console.log(totalDistance);
-            
+
             d3.select(this)
-                .attr("id", function() {
+                .attr("id", function () {
                     return "path_" + theId;
                 })
                 .attr("stroke", "steelblue")
@@ -277,20 +279,20 @@ var D3LMap = {
                 // .duration(function(d, i) {
                 //     return duration; 
                 // })
-                .ease("cubic-in-out")
+                .ease("lienar")
                 .attr("stroke-dashoffset", 0)
-                .attr("style", function() {
+                .attr("style", function () {
                     // return "stroke-dashoffset 5s ease-in-out; pointer-events:none;";
                     return "pointer-events:none;";
                 })
-                .each("start", function(d) {
+                .each("start", function () {
                     D3LMap.animatePulse(start_circ, "outgoing");
-                    console.log('test :: ' + actualDelay);
-                    // setTimeout(D3LMap.animatePulse(end_circ, "incoming"), duration);
+                    console.log('duration :: ' + actualDuration);
+                    setTimeout(D3LMap.animatePulse(end_circ, "incoming"), actualDuration);
                 })
-                .each("end", function(d) {
-                    // console.log(startTime);
-                    D3LMap.animatePulse(end_circ, "incoming");
+                .each("end", function () {
+                    console.log('why the delay?');
+                    // D3LMap.animatePulse(end_circ, "incoming");
                     d3.select(this)
                         .transition()
                         .delay(1000)
@@ -302,9 +304,9 @@ var D3LMap = {
         });
     },
 
-    animatePulse: function(target, phase) {
+    animatePulse: function (target, phase) {
         //console.log("target station ---->  " + target);
-        switch(phase) {
+        switch (phase) {
             case "incoming" :
                     //console.log('end');
                     target
@@ -355,7 +357,7 @@ var D3LMap = {
     },
 
     calcTimeDiff: function(_start, _end) {
-        // console.log(_start, _end);
+        // console.log(_start, _end + " :: <-------------------- raw from data");
         var start = _start,
             end = _end,
             hours = end.split(':')[0] - start.split(':')[0],
@@ -363,7 +365,7 @@ var D3LMap = {
             minFraction = 0,
             conversion = 0;
 
-            // console.log(hours, minutes);
+            // console.log(hours, minutes + " :: <-------------------- popped");
         
         // minutes = minutes.toString().length < 2 ? '0' + minutes : minutes;
 
@@ -388,8 +390,8 @@ var D3LMap = {
             conversion = 24 - conversion;
         }
 
-        return conversion;
         // console.log(conversion);
+        return conversion;
     },
 
     divvyTimer: {
@@ -405,13 +407,20 @@ var D3LMap = {
             this.hour = _startHour;
             this.speed = _speed;
             this.node.innerText = "00:00";
-            console.log(this.node);
+            // console.log(this.node);
         },
 
         start: function() {
             var that = this; // needs closure for proper scope
-            this.interval = d3.timer(function() { that.run(); });
+            // this.interval = d3.timer(function() { that.run(); });
             //this.interval = setInterval(function() { that.run(); }, this.speed);
+            
+            var startTime = Date.now();
+
+            this.interval = setCorrectingInterval(function() {
+                that.run();
+                // console.log((Date.now() - startTime) + 'ms elapsed');
+            }, this.speed);
         }, 
 
         stop: function() {
@@ -425,7 +434,7 @@ var D3LMap = {
                 this.min = 0;
                 this.hour++;
                 this.hourCount++;
-                console.log(this.hourCount);
+                // console.log(this.hourCount + " <------- hour count");
             }
             if(this.hour === 0) {
                 // start at midnight if 0 is passed for start time
@@ -442,11 +451,9 @@ var D3LMap = {
                 this.hour = 1;
             }
             if(this.hourCount === 24) {
-                console.log('Y U NO stop timer!?');
-                return true;
-                // clearInterval(this.interval);
+                clearCorrectingInterval(this.interval);
             }
-            // console.log(this);
+
             this.node.innerText = ((this.hour < 10) ? " " + this.hour : this.hour) + ":" + ((this.min < 10) ? "0" + this.min : this.min) + " " + this.diem;
         },
 

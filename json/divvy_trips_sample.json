@@ -3416,5 +3416,19 @@
     "usertype":"Subscriber",
     "gender":"Male",
     "birthday":1989
+  },
+  {
+    "trip_id":25700,
+    "starttime":"2013-07-04 23:59",
+    "stoptime":"2013-07-05 00:59",
+    "bikeid":28,
+    "tripduration":1270,
+    "from_station_id":44,
+    "from_station_name":"State St & Randolph St",
+    "to_station_id":25,
+    "to_station_name":"Michigan Ave & Pearson St",
+    "usertype":"Subscriber",
+    "gender":"Male",
+    "birthday":1989
   }
 ]}
