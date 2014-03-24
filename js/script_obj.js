@@ -92,7 +92,7 @@ var D3LMap = {
         };
 
         D3LMap.drawAnimatedMarkers();
-        D3LMap.drawCountMarkers();
+        //D3LMap.drawCountMarkers();
 
         D3LMap.divvyTimer.init(D3LMap.dayStartTime, D3LMap.timerSpeed);
         D3LMap.initTripPaths();
@@ -124,7 +124,8 @@ var D3LMap = {
                 .data(collection.features)
                 .enter().append("circle")
                 .attr("r", function () {
-                    return D3LMap.circsize;
+                    // return D3LMap.circsize;
+                    return 0;
                 })
                 .attr('fill', 'coral')
                 .attr("id", function (d) {
@@ -139,7 +140,8 @@ var D3LMap = {
                     return D3LMap.map.latLngToLayerPoint(d.LatLng).y;
                 });
                 feature.attr("r", function () {
-                    return D3LMap.circsize / 1400 * Math.pow(2, D3LMap.map.getZoom());
+                    // return D3LMap.circsize / 1400 * Math.pow(2, D3LMap.map.getZoom());
+                    return 0;
                 });
             }
 
@@ -161,7 +163,8 @@ var D3LMap = {
                 .enter()
                 .append("circle")
                 .attr("r", function () {
-                    return D3LMap.circsize * 2;
+                    // return D3LMap.circsize * 2;
+                    return 0;
                 })
                 .attr('fill', 'coral')
                 .attr('opacity', 1);
@@ -197,7 +200,8 @@ var D3LMap = {
                     return D3LMap.map.latLngToLayerPoint(d.LatLng).y;
                 });
                 feature.attr("r", function () {
-                    return D3LMap.circsize / 1400 * Math.pow(2, D3LMap.map.getZoom());
+                    // return D3LMap.circsize / 1400 * Math.pow(2, D3LMap.map.getZoom());
+                    return 0;
                 });
             }
 
@@ -254,12 +258,15 @@ var D3LMap = {
                 start_latlng = new L.LatLng(data.features[0].geometry.coordinates[idx][0][1], data.features[0].geometry.coordinates[idx][0][0]),
                 end_latlng = new L.LatLng(data.features[0].geometry.coordinates[idx][1][1], data.features[0].geometry.coordinates[idx][1][0]),
                 start_circ = data.features[0].properties.targ_circ_start[idx],
+                // start_circ_id = data.features[0].properties.unique_ids[idx],
                 end_circ = data.features[0].properties.targ_circ_end[idx],
                 totalDistance = L.GeometryUtil.length([start_latlng, end_latlng]),
                 // theNode = d3.select(this).node(),
                 actualDuration = data.features[0].properties.trip_durations[idx],
                 // startTime = data.features[0].properties.start_times[idx],
                 actualDelay = data.features[0].properties.start_delays[idx];
+
+                // console.log(start_circ_id);
 
             d3.select(this)
                 .attr("id", function () {
@@ -286,12 +293,12 @@ var D3LMap = {
                     return "pointer-events:none;";
                 })
                 .each("start", function () {
+                    // console.log(start_circ_id + " <---------------------");
                     D3LMap.animatePulse(start_circ, "outgoing");
-                    console.log('duration :: ' + actualDuration);
+                    // console.log('duration :: ' + actualDuration);
                     setTimeout(D3LMap.animatePulse(end_circ, "incoming"), actualDuration);
                 })
                 .each("end", function () {
-                    console.log('why the delay?');
                     // D3LMap.animatePulse(end_circ, "incoming");
                     d3.select(this)
                         .transition()
@@ -300,7 +307,7 @@ var D3LMap = {
                         .ease('linear')
                         .attr('stroke', 'green')
                         .style("opacity", 0.0);
-                });
+                })
         });
     },
 
@@ -308,46 +315,63 @@ var D3LMap = {
         //console.log("target station ---->  " + target);
         switch (phase) {
             case "incoming" :
-                    //console.log('end');
-                    target
-                        .attr("stroke", "steelblue")
+                //console.log(target.attr('r'));
+                var node = d3.select(target.node());
+                var parent_node = d3.select(target.node().parentNode);
+
+                    parent_node
+                        .append("circle")
+                        .attr("cx", function(){ return node.attr('cx'); })
+                        .attr("cy", function(){ return node.attr('cy'); })
+                        .attr("stroke", "green")
                         .attr("stroke-width", "2")
                         .attr("fill", "none")
                         .attr('opacity', 0)
-                        .attr("r", function(d) {
-                            return D3LMap.getCircSize() * 5;
-                        })
+                        .attr("r", function(d) { return D3LMap.getCircSize() * 10; })
                         .transition()
-                        .duration(500)
+                        .duration(750)
                         .delay(0)
-                        .attr("stroke", "green")
+                        .attr("stroke", "steelblue")
                         .attr("fill", "none")
                         .attr('opacity', 1)
                         .attr("r", function(d) {
                             return 0;
-                        });
+                        })
+                        .each("end", function(){ return this.remove(); });
+
+                    target
+                        .attr('opacity', 0.5)
+                        .transition()
+                        .duration(250)
+                        .delay(0)
+                        .attr('stroke-width', function(){ return parseInt(target.attr('stroke-width')) + 1 })
+                        .attr('stroke', 'steelblue')
+                        .attr('r', function(){ return parseInt(target.attr('r')) + 5; })
+                        // .each("end", function(d){ console.log( parseInt(target.style('stroke-width'))) + 1; });
+
                 break;
 
             case "outgoing" :
-                    //console.log('start');
-                    target
+                var node = d3.select(target.node());
+                var parent_node = d3.select(target.node().parentNode);
+                
+                    parent_node
+                        .append("circle")
+                        .attr("cx", function(){ return node.attr('cx'); })
+                        .attr("cy", function(){ return node.attr('cy'); })
                         .attr("stroke", "red")
                         .attr("stroke-width", "2")
                         .attr("fill", "none")
                         .attr('opacity', 1)
-                        .attr("r", function(d) {
-                            // return D3LMap.getCircSize();
-                            return 0;
-                        })
+                        .attr("r", 0)
                         .transition()
-                        .duration(500)
+                        .duration(750)
                         .delay(0)
                         .attr("stroke", "steelblue")
                         .attr("fill", "none")
                         .attr('opacity', 0)
-                        .attr("r", function(d) {
-                            return D3LMap.getCircSize() * 5;
-                        });
+                        .attr("r", function(d) { return D3LMap.getCircSize() * 10; })
+                        .each("end", function(){ return this.remove(); });
                 break;
         }
     },
