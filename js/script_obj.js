@@ -33,7 +33,7 @@ var D3LMap = {
     // vars for day timer and ui 
     timer: undefined,
     dayStartTime: 0,
-    timerSpeed: 12, // ( 24000 ms total or 1440 ticks total ) 60 minutes / hour * 24 seconds = 1440 ticks total - 24000/1440 = 16.6;   
+    timerSpeed: 33.2, // ( 24000 ms total or 1440 ticks total ) 60 minutes / hour * 24 seconds = 1440 ticks total - 24000/1440 = 16.6;   
 
     initMap: function () {
         D3LMap.toner = new L.TileLayer(D3LMap.tonerUrl, {
@@ -138,7 +138,7 @@ var D3LMap = {
                     uniqueID = data[idx].unique_id,
                     tripduration = data[idx].tripduration * 2,
                     startTime = data[idx].starttime.split(" ").pop(), // pop just the time off the end
-                    startDelay = D3LMap.calcTimeDiff(startTime, D3LMap.dayStartTime.toString() + ":00") * 1000;
+                    startDelay = D3LMap.calcTimeDiff(startTime, D3LMap.dayStartTime.toString() + ":00") * 2000;
 
                 // push data into geo json object
                 D3LMap.geojson.features[0].geometry.coordinates.push(latLng);
@@ -181,7 +181,7 @@ var D3LMap = {
                 .transition()
                 .delay(actualDelay)
                 .duration(actualDuration)
-                .ease("lienar")
+                .ease('in-out')
                 .attr("stroke-dashoffset", 0)
                 .attr("style", function () {
                     // return "stroke-dashoffset 5s ease-in-out; pointer-events:none;";
@@ -227,6 +227,7 @@ var D3LMap = {
                         .transition()
                         .duration(1500)
                         .delay(0)
+                        .ease('out')
                         .attr('opacity', 0.75)
                         .attr("r", function () { return 0; })
                         .each("end", function () { return this.remove(); });
@@ -237,10 +238,11 @@ var D3LMap = {
                         .transition()
                         .duration(250)
                         .delay(0)
+                        .ease('out')
                         .attr("fill", "blue")
                         // .attr('stroke-width', function () { return parseInt(target.attr('stroke-width')) + 1 })
                         // .attr('stroke', 'steelblue')
-                        .attr('r', function () { return parseInt(innerTarget.attr('r')) + 2; });
+                        .attr('r', function () { return parseInt(innerTarget.attr('r')) + 3; });
                 break;
 
             case "outgoing":
@@ -257,6 +259,7 @@ var D3LMap = {
                         .transition()
                         .duration(1500)
                         .delay(0)
+                        .ease('out')
                         .attr('opacity', 0)
                         .attr("r", function () { return D3LMap.getCircSize() * 10; })
                         .each("end", function () { return this.remove(); });
@@ -267,6 +270,7 @@ var D3LMap = {
                         .transition()
                         .duration(250)
                         .delay(0)
+                        .ease('out')
                         .attr('fill', 'yellow')
                         // .attr('stroke-width', function () { 
                         //     var sw = parseInt(target.style('stroke-width'));
@@ -276,7 +280,7 @@ var D3LMap = {
                         // })
                         // .attr('r', function () { return parseInt(target.attr('r')) + 2; });
                         .attr('r', function () { 
-                            return parseInt(outerTarget.attr('r')) + 2; 
+                            return parseInt(outerTarget.attr('r')) + 3; 
                         });
                         // .each("end", function(){ console.log( parseInt(target.style('stroke-width')) + 4 ); });
                 break;
@@ -405,7 +409,7 @@ MarkerObj.prototype.init = function() {
             .attr("id", function (d) {
                 return id + d.id; // assign a unique id so we can target for animation later
             });
-        
+
         var reset = function() { update(feat); };
 
         D3LMap.map.on("viewreset", reset);
@@ -420,9 +424,10 @@ MarkerObj.prototype.update = function(feat) {
     feat.attr("cy", function (d) {
         return D3LMap.map.latLngToLayerPoint(d.LatLng).y;
     });
-    feat.attr("r", function () {
-        return D3LMap.circsize / 1400 * Math.pow(2, D3LMap.map.getZoom());
-    });
+    // feat.attr("r", function (d) {
+    //     // console.log(parseInt(feat.attr('r')));
+    //     return D3LMap.circsize / 1400 * Math.pow(2, D3LMap.map.getZoom());
+    // });
 };
 
 window.onload = function () {
