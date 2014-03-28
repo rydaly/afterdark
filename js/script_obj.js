@@ -4,6 +4,7 @@
     * create up-front splash page that will initialize the app based on a date selected from a calendar
     * create a scrubbable timeline that corresponds to clock? This will be considerably difficult
     * stop clock after 24 hours and give option to reset or select another day.
+    * fix zooming - scales not being maintained on circles
 */
 
 /* globals */
