@@ -4,10 +4,7 @@
     * create up-front splash page that will initialize the app based on a date selected from a calendar
     * create a scrubbable timeline that corresponds to clock? This will be considerably difficult
     * stop clock after 24 hours and give option to reset or select another day.
-    * fix zooming - currently broken
 */
-
-'use strict';
 
 /* globals */
 var L, d3;
@@ -35,7 +32,7 @@ var D3LMap = {
     // vars for day timer and ui 
     timer: undefined,
     dayStartTime: 0,
-    timerSpeed: 14.4, // ( 24000 ms total or 1440 ticks total ) 60 minutes / hour * 24 seconds = 1440 ticks total / 100;   
+    timerSpeed: 12, // ( 24000 ms total or 1440 ticks total ) 60 minutes / hour * 24 seconds = 1440 ticks total - 24000/1440 = 16.6;   
 
     initMap: function () {
         D3LMap.toner = new L.TileLayer(D3LMap.tonerUrl, {
@@ -56,7 +53,7 @@ var D3LMap = {
         /* pick up the SVG from the map object */
         D3LMap.svg = d3.select("#map").select("svg");
         
-        /* append three groups to hold two sets of station markers */
+        /* append three groups of station markers */
         D3LMap.g1 = D3LMap.svg.append("g").attr("class", "leaflet-zoom-hide");
         D3LMap.g2 = D3LMap.svg.append("g").attr("class", "leaflet-zoom-hide");
         D3LMap.g3 = D3LMap.svg.append("g").attr("class", "leaflet-zoom-hide");
@@ -74,8 +71,10 @@ var D3LMap = {
                     'unique_ids': [],
                     'start_times': [],
                     'trip_durations': [],
-                    'targ_circ_start': [],
-                    'targ_circ_end': [],
+                    'targ_circ_start_inner': [],
+                    'targ_circ_start_outer': [],
+                    'targ_circ_end_inner': [],
+                    'targ_circ_end_outer': [],
                     'start_delays': []
                 }
             }]
@@ -95,7 +94,7 @@ var D3LMap = {
         };
 
         // replace this with a callback later... will load when user selects day
-        setTimeout(this.startAnimation, 2500);
+        var timer = setTimeout(this.startAnimation, 2500);
     },
     
     drawMarkers: function() {
@@ -117,8 +116,10 @@ var D3LMap = {
                 d.start_point = new L.LatLng(D3LMap.stations[d.from_station_id].lat, D3LMap.stations[d.from_station_id].lng);
                 d.end_point = new L.LatLng(D3LMap.stations[d.to_station_id].lat, D3LMap.stations[d.to_station_id].lng);
                 d.unique_id = idx;
-                d.targ_circ_start = d3.select("#inner_circs_" + d.from_station_id);
-                d.targ_circ_end = d3.select("#outer_circs_" + d.to_station_id);
+                d.targ_circ_start_inner = d3.select("#inner_circs_" + d.from_station_id);
+                d.targ_circ_start_outer = d3.select("#outer_circs_" + d.from_station_id);
+                d.targ_circ_end_inner = d3.select("#inner_circs_" + d.to_station_id);
+                d.targ_circ_end_outer = d3.select("#outer_circs_" + d.to_station_id);
             });
 
             convertToGeojson(collection.features);
@@ -128,11 +129,13 @@ var D3LMap = {
             data.forEach(function(d, idx) {
                 var strtLatLng = [data[idx].start_point.lng, data[idx].start_point.lat],
                     endLatLng = [data[idx].end_point.lng, data[idx].end_point.lat],
-                    targStart = data[idx].targ_circ_start,
-                    targEnd = data[idx].targ_circ_end,
+                    targStartInner = data[idx].targ_circ_start_inner,
+                    targStartOuter = data[idx].targ_circ_start_outer,
+                    targEndInner = data[idx].targ_circ_end_inner,
+                    targEndOuter = data[idx].targ_circ_end_outer,
                     latLng = [strtLatLng, endLatLng],
                     uniqueID = data[idx].unique_id,
-                    tripduration = data[idx].tripduration,
+                    tripduration = data[idx].tripduration * 2,
                     startTime = data[idx].starttime.split(" ").pop(), // pop just the time off the end
                     startDelay = D3LMap.calcTimeDiff(startTime, D3LMap.dayStartTime.toString() + ":00") * 1000;
 
@@ -140,8 +143,10 @@ var D3LMap = {
                 D3LMap.geojson.features[0].geometry.coordinates.push(latLng);
                 D3LMap.geojson.features[0].properties.unique_ids.push(uniqueID);
                 D3LMap.geojson.features[0].properties.trip_durations.push(tripduration);
-                D3LMap.geojson.features[0].properties.targ_circ_start.push(targStart);
-                D3LMap.geojson.features[0].properties.targ_circ_end.push(targEnd);
+                D3LMap.geojson.features[0].properties.targ_circ_start_inner.push(targStartInner);
+                D3LMap.geojson.features[0].properties.targ_circ_start_outer.push(targStartOuter);
+                D3LMap.geojson.features[0].properties.targ_circ_end_inner.push(targEndInner);
+                D3LMap.geojson.features[0].properties.targ_circ_end_outer.push(targEndOuter);
                 D3LMap.geojson.features[0].properties.start_times.push(startTime);
                 D3LMap.geojson.features[0].properties.start_delays.push(startDelay);
             });
@@ -155,11 +160,12 @@ var D3LMap = {
             var theId = idx,
                 start_latlng = new L.LatLng(data.features[0].geometry.coordinates[idx][0][1], data.features[0].geometry.coordinates[idx][0][0]),
                 end_latlng = new L.LatLng(data.features[0].geometry.coordinates[idx][1][1], data.features[0].geometry.coordinates[idx][1][0]),
-                start_circ = data.features[0].properties.targ_circ_start[idx],
-                end_circ = data.features[0].properties.targ_circ_end[idx],
+                start_circ_inner = data.features[0].properties.targ_circ_start_inner[idx],
+                start_circ_outer = data.features[0].properties.targ_circ_start_outer[idx],
+                end_circ_inner = data.features[0].properties.targ_circ_end_inner[idx],
+                end_circ_outer = data.features[0].properties.targ_circ_end_outer[idx],
                 totalDistance = L.GeometryUtil.length([start_latlng, end_latlng]),
                 actualDuration = data.features[0].properties.trip_durations[idx],
-                // startTime = data.features[0].properties.start_times[idx],
                 actualDelay = data.features[0].properties.start_delays[idx];
 
             d3.select(this)
@@ -181,15 +187,15 @@ var D3LMap = {
                     return "pointer-events:none;";
                 })
                 .each("start", function () {
-                    D3LMap.animatePulse(start_circ, "outgoing");
-                    setTimeout(D3LMap.animatePulse(end_circ, "incoming"), actualDuration);
+                    D3LMap.animatePulse(start_circ_outer, start_circ_inner, "outgoing");
+                    setTimeout(D3LMap.animatePulse(end_circ_outer, end_circ_inner, "incoming"), actualDuration);
                 })
                 .each("end", function () {
-                    // D3LMap.animatePulse(end_circ, "incoming");
+                    // D3LMap.animatePulse(end_circ_inner, "incoming");
                     d3.select(this)
                         .transition()
-                        .delay(1000)
-                        .duration(2500)
+                        .delay(actualDuration)
+                        .duration(2000)
                         .ease('linear')
                         .attr('stroke', 'white')
                         .style("opacity", 0.1);
@@ -197,9 +203,12 @@ var D3LMap = {
         });
     },
 
-    animatePulse: function (target, phase) {
-        var node = d3.select(target.node()),
-            parent_node = d3.select(target.node().parentNode);
+    // re-hash this so that if it's incoming, it incs the innerTarget, vise versa
+    animatePulse: function (outerTarget, innerTarget, phase) {
+        var outer_node = d3.select(outerTarget.node()),
+            inner_node = d3.select(innerTarget.node()),
+            parent_node = d3.select(outerTarget.node().parentNode),
+            cur_inner_r = inner_node.attr('r');
 
         switch (phase) {
 
@@ -207,69 +216,67 @@ var D3LMap = {
                     // pulse inward
                     parent_node
                         .append("circle")
-                        .attr("cx", function () { return node.attr('cx'); })
-                        .attr("cy", function () { return node.attr('cy'); })
-                        .attr("stroke", "green")
+                        .attr("cx", function () { return outer_node.attr('cx'); })
+                        .attr("cy", function () { return outer_node.attr('cy'); })
+                        .attr("stroke", "blue")
                         .attr("stroke-width", "2")
                         .attr("fill", "none")
                         .attr('opacity', 0)
-                        .attr("r", function () { return D3LMap.getCircSize() * 10; })
+                        .attr("r", function () { return D3LMap.getCircSize() * 15; })
                         .transition()
-                        .duration(750)
+                        .duration(1500)
                         .delay(0)
-                        .attr("stroke", "steelblue")
-                        .attr("fill", "none")
-                        .attr('opacity', 1)
+                        .attr('opacity', 0.75)
                         .attr("r", function () { return 0; })
                         .each("end", function () { return this.remove(); });
 
                     // modify the inner circle
-                    target
-                        .attr('opacity', 1)
+                    innerTarget
+                        .attr('opacity', 0.75)
                         .transition()
                         .duration(250)
                         .delay(0)
-                        .attr("fill", "YellowGreen")
+                        .attr("fill", "blue")
                         // .attr('stroke-width', function () { return parseInt(target.attr('stroke-width')) + 1 })
                         // .attr('stroke', 'steelblue')
-                        .attr('r', function () { return parseInt(target.attr('r')) + 2; })
-
+                        .attr('r', function () { return parseInt(innerTarget.attr('r')) + 2; });
                 break;
 
             case "outgoing":
                     // pulse outward
                     parent_node
                         .append("circle")
-                        .attr("cx", function () { return node.attr('cx'); })
-                        .attr("cy", function () { return node.attr('cy'); })
-                        .attr("stroke", "Tomato")
+                        .attr("cx", function () { return outer_node.attr('cx'); })
+                        .attr("cy", function () { return outer_node.attr('cy'); })
+                        .attr("stroke", "yellow")
                         .attr("stroke-width", "2")
                         .attr("fill", "none")
-                        .attr('opacity', 1)
+                        .attr('opacity', 0.75)
                         .attr("r", 0)
                         .transition()
-                        .duration(750)
+                        .duration(1500)
                         .delay(0)
-                        .attr("stroke", "steelblue")
-                        .attr("fill", "none")
                         .attr('opacity', 0)
                         .attr("r", function () { return D3LMap.getCircSize() * 10; })
                         .each("end", function () { return this.remove(); });
 
                     // modify the outer circle
-                    target
-                        .attr('opacity', 0.5)
+                    outerTarget
+                        .attr('opacity', 1)
                         .transition()
                         .duration(250)
                         .delay(0)
-                        .attr('fill', 'red')
+                        .attr('fill', 'yellow')
                         // .attr('stroke-width', function () { 
                         //     var sw = parseInt(target.style('stroke-width'));
                         //         sw += 4;
                         //         console.log(sw);
                         //     return sw; 
                         // })
-                        .attr('r', function () { return parseInt(target.attr('r')) + 2; })
+                        // .attr('r', function () { return parseInt(target.attr('r')) + 2; });
+                        .attr('r', function () { 
+                            return parseInt(outerTarget.attr('r')) + 2; 
+                        });
                         // .each("end", function(){ console.log( parseInt(target.style('stroke-width')) + 4 ); });
                 break;
         }
@@ -393,11 +400,14 @@ MarkerObj.prototype.init = function() {
             .enter().append("circle")
             .attr('fill', 'none')
             .attr('opacity', 0)
+            .attr('r', 0)
             .attr("id", function (d) {
                 return id + d.id; // assign a unique id so we can target for animation later
             });
+        
+        var reset = function() { update(feat); };
 
-        D3LMap.map.on("viewreset", update(feat));
+        D3LMap.map.on("viewreset", reset);
         update(feat);
     });
 };
@@ -416,4 +426,4 @@ MarkerObj.prototype.update = function(feat) {
 
 window.onload = function () {
     D3LMap.initMap();
-}
+};
