@@ -8,13 +8,6 @@
 	        body { height: 100%; margin: 0; padding: 0;}
 	        #map{ background-color:#222222; height: 100% }
 	        .leaflet-layer { opacity: 0.1; }
-	        /*.leaflet-overlay-pane .line {
-			    fill: none;
-			    stroke: #ccc;
-			    stroke-width: 2;
-			    stroke-opacity: 0.75;
-			    z-index: 1;
-			}*/
             .clockStyle {
                 background-color:#222;
                 padding:10px;
@@ -24,9 +17,37 @@
                 letter-spacing: 2px;
                 display:inline;
                 position: fixed;
-                bottom: 0;
-                left: 0;
+                top: 0;
+                right: 0;
                 z-index: 9999;
+            }
+
+            .d3-tip {
+                line-height: 1;
+                padding: 12px;
+                background: rgba(0, 0, 0, 0.75);
+                color: #eee;
+                border-radius: 2px;
+            }
+
+            /* Creates a small triangle extender for the tooltip */
+            .d3-tip:after {
+                box-sizing: border-box;
+                display: inline;
+                font-size: 10px;
+                width: 100%;
+                line-height: 1;
+                color: rgba(0, 0, 0, 0.8);
+                content: "\25BC";
+                position: absolute;
+                text-align: center;
+            }
+
+            /* Style northward tooltips differently */
+            .d3-tip.n:after {
+                margin: -1px 0 0 0;
+                top: 100%;
+                left: 0;
             }
         </style>
         <!--[if lte IE 8]>
@@ -45,6 +66,7 @@
         <script type="text/javascript" src="js/leaflet.providers.js"></script>
         <script type="text/javascript" src="js/leaflet.hash.js"></script>
 		<script type="text/javascript" src="js/d3.v3.min.js"></script>
+        <script type="text/javascript" src="bower_components/d3-tip/index.js"></script>
 		<!-- <script src="http://d3js.org/d3.v3.min.js"></script> -->
 		<!-- <script src="http://d3js.org/topojson.v1.min.js"></script> -->
 		<!-- <script src="http://d3js.org/d3.geo.projection.v0.min.js"></script> -->

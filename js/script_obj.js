@@ -4,7 +4,6 @@
     * create up-front splash page that will initialize the app based on a date selected from a calendar
     * create a scrubbable timeline that corresponds to clock? This will be considerably difficult
     * stop clock after 24 hours and give option to reset or select another day.
-    * fix zooming - scales not being maintained on circles
 */
 
 /* globals */
@@ -29,11 +28,12 @@ var D3LMap = {
     g2: undefined,
     g3: undefined,
     circsize: 1,
+    tip: undefined,
 
-    // vars for day timer and ui 
+    // vars for day timer and ui
     timer: undefined,
     dayStartTime: 0,
-    timerSpeed: 33.2, // ( 24000 ms total or 1440 ticks total ) 60 minutes / hour * 24 seconds = 1440 ticks total - 24000/1440 = 16.6;   
+    timerSpeed: 33.2, // ( 24000 ms total or 1440 ticks total ) 60 minutes / hour * 24 seconds = 1440 ticks total - 24000/1440 = 16.6;
 
     initMap: function () {
         D3LMap.toner = new L.TileLayer(D3LMap.tonerUrl, {
@@ -46,6 +46,14 @@ var D3LMap = {
             layers: [D3LMap.toner]
         });
 
+        /* for data tips */
+        D3LMap.tip = d3.tip()
+            .attr('class', 'd3-tip')
+            .offset([-10, 0])
+            .html(function(d) {
+            return "Station :: <span>" + d.name + "</span>";
+        });
+
         /* Initialize the SVG layer */
         D3LMap.map._initPathRoot();
 
@@ -53,7 +61,10 @@ var D3LMap = {
 
         /* pick up the SVG from the map object */
         D3LMap.svg = d3.select("#map").select("svg");
-        
+
+        /* bind tips to SVG */
+        D3LMap.svg.call(D3LMap.tip);
+
         /* append three groups of station markers */
         D3LMap.g1 = D3LMap.svg.append("g").attr("class", "leaflet-zoom-hide");
         D3LMap.g2 = D3LMap.svg.append("g").attr("class", "leaflet-zoom-hide");
@@ -97,7 +108,7 @@ var D3LMap = {
         // replace this with a callback later... will load when user selects day
         var timer = setTimeout(this.startAnimation, 2500);
     },
-    
+
     drawMarkers: function() {
         var circs_layer1 = new MarkerObj(D3LMap.g1, "pulse_circs_"),
             circs_layer2 = new MarkerObj(D3LMap.g2, "outer_circs_"),
@@ -272,15 +283,15 @@ var D3LMap = {
                         .delay(0)
                         .ease('out')
                         .attr('fill', 'yellow')
-                        // .attr('stroke-width', function () { 
+                        // .attr('stroke-width', function () {
                         //     var sw = parseInt(target.style('stroke-width'));
                         //         sw += 4;
                         //         console.log(sw);
-                        //     return sw; 
+                        //     return sw;
                         // })
                         // .attr('r', function () { return parseInt(target.attr('r')) + 2; });
-                        .attr('r', function () { 
-                            return parseInt(outerTarget.attr('r')) + 3; 
+                        .attr('r', function () {
+                            return parseInt(outerTarget.attr('r')) + 3;
                         });
                         // .each("end", function(){ console.log( parseInt(target.style('stroke-width')) + 4 ); });
                 break;
@@ -388,9 +399,9 @@ function MarkerObj(group, id) {
 }
 
 MarkerObj.prototype.init = function() {
-    var gr = this.group,
+    var group = this.group,
         id = this.id,
-        feat = this.feature,
+        feature = this.feature,
         update = this.update;
 
     d3.json(this.dataPath, function (collection) {
@@ -400,7 +411,7 @@ MarkerObj.prototype.init = function() {
             // store station id with lat & long
             D3LMap.stations[d.id] = d.LatLng;
         });
-        feat = gr.selectAll("circle")
+        feature = group.selectAll("circle")
             .data(collection.features)
             .enter().append("circle")
             .attr('fill', 'none')
@@ -408,12 +419,14 @@ MarkerObj.prototype.init = function() {
             .attr('r', 0)
             .attr("id", function (d) {
                 return id + d.id; // assign a unique id so we can target for animation later
-            });
+            })
+            .on('mouseover', D3LMap.tip.show)
+            .on('mouseout', D3LMap.tip.hide);
 
-        var reset = function() { update(feat); };
+        var reset = function() { update(feature); };
 
         D3LMap.map.on("viewreset", reset);
-        update(feat);
+        update(feature);
     });
 };
 
@@ -426,7 +439,7 @@ MarkerObj.prototype.update = function(feat) {
     });
     // feat.attr("r", function (d) {
     //     // console.log(parseInt(feat.attr('r')));
-    //     return D3LMap.circsize / 1400 * Math.pow(2, D3LMap.map.getZoom());
+    //     return 4 / 1400 * Math.pow(2, D3LMap.map.getZoom());
     // });
 };
 
