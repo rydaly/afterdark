@@ -4,6 +4,7 @@
     * create up-front splash page that will initialize the app based on a date selected from a calendar
     * create a scrubbable timeline that corresponds to clock? This will be considerably difficult
     * stop clock after 24 hours and give option to reset or select another day.
+    * stats - most overall traffic / busiest, most outgoing, most incoming - zoom and pan to station on click
 */
 
 /* globals */
@@ -50,9 +51,9 @@ var D3LMap = {
         D3LMap.tip = d3.tip()
             .attr('class', 'd3-tip')
             .offset([-10, 0])
-            .html(function(d) {
-            return "Station :: <span>" + d.name + "</span>";
-        });
+            .html(function (d) {
+                return "Station :: <span>" + d.name + "</span>";
+            });
 
         /* Initialize the SVG layer */
         D3LMap.map._initPathRoot();
@@ -106,10 +107,11 @@ var D3LMap = {
         };
 
         // replace this with a callback later... will load when user selects day
-        var timer = setTimeout(this.startAnimation, 2500);
+        D3LMap.timer = setTimeout(this.startAnimation, 2500);
     },
 
-    drawMarkers: function() {
+    drawMarkers: function () {
+        "use strict";
         var circs_layer1 = new MarkerObj(D3LMap.g1, "pulse_circs_"),
             circs_layer2 = new MarkerObj(D3LMap.g2, "outer_circs_"),
             circs_layer3 = new MarkerObj(D3LMap.g3, "inner_circs_");
@@ -342,7 +344,7 @@ var D3LMap = {
         init: function (starHour, speed) {
             this.hour = starHour;
             this.speed = speed;
-            this.node.innerText = "00:00";
+            this.node.innerText = "12:00 AM";
         },
 
         start: function () {
@@ -423,7 +425,7 @@ MarkerObj.prototype.init = function() {
             .on('mouseover', D3LMap.tip.show)
             .on('mouseout', D3LMap.tip.hide);
 
-        var reset = function() { update(feature); };
+        var reset = function () { update(feature); };
 
         D3LMap.map.on("viewreset", reset);
         update(feature);
@@ -443,6 +445,12 @@ MarkerObj.prototype.update = function(feat) {
     // });
 };
 
-window.onload = function () {
-    D3LMap.initMap();
+function initMain () {
+    if (window.location.hash) {
+        console.log('init map...');
+        D3LMap.initMap();
+    } else {
+        console.log("show splash");
+    }
+
 };
