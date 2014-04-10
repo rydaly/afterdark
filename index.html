@@ -109,7 +109,7 @@
     </head>
     <body>
         <div id="splash">
-            <a href="#" class="go" onclick="initApp('go');">GO</a>
+            <a href="#" class="go" onclick="splashOut('go');">GO</a>
         </div>
         
         <div id="clockDisplay" class="clockStyle"></div>
@@ -117,7 +117,6 @@
         <div id="map"></div>
 
         <script type="text/javascript" src="//dl1d2m8ri9v3j.cloudfront.net/releases/1.2.4/tracker.js" data-customer="b32ff1355c5c4f6aa5a2c9ca89224eee"></script>
-		<!-- <script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"></script> -->
         <script type="text/javascript" src="js/lib/greensock/TweenLite.min.js"></script>
         <script type="text/javascript" src="js/lib/greensock/easing/EasePack.min.js"></script>
         <script type="text/javascript" src="js/lib/greensock/plugins/CSSPlugin.min.js"></script>
@@ -128,22 +127,19 @@
         <script type="text/javascript" src="js/leaflet.hash.js"></script>
 		<script type="text/javascript" src="js/d3.v3.min.js"></script>
         <script type="text/javascript" src="bower_components/d3-tip/index.js"></script>
-		<!-- <script src="http://d3js.org/d3.v3.min.js"></script> -->
-		<!-- <script src="http://d3js.org/topojson.v1.min.js"></script> -->
-		<!-- <script src="http://d3js.org/d3.geo.projection.v0.min.js"></script> -->
         <script type="text/javascript" src="js/leaflet.geometryutil.js"></script>
         <script type="text/javascript" src="js/correctingInterval.min.js"></script>
         <script type="text/javascript" src="js/script_obj.js"></script>
         <script type="text/javascript">
-            // window.onload = function () {
-            //     initMain();
-            // };
             var splash = document.getElementById('splash');
 
+            function splashOut(data) {
+                TweenLite.to(splash, 0.75, { autoAlpha:0, height:0, onComplete:initApp, onCompleteParams:[data] });
+            };
+
             function initApp(data) {
-                // console.log(data);
-                window.location.hash = "go";
-                TweenLite.to(splash, 1, { autoAlpha:0, height:0 });
+                // show loader animation here...
+                window.location.hash = data;
                 initMain();
             };
         </script>

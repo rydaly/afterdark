@@ -447,10 +447,13 @@ MarkerObj.prototype.update = function(feat) {
 
 function initMain () {
     if (window.location.hash) {
+        console.log(window.location.hash);
         console.log('init map...');
         D3LMap.initMap();
     } else {
         console.log("show splash");
+        console.log(window.location.hash);
+        D3LMap.initMap();
     }
 
 };
