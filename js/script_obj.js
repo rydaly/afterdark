@@ -67,9 +67,9 @@ var D3LMap = {
         D3LMap.svg.call(D3LMap.tip);
 
         /* append three groups of station markers */
-        D3LMap.g1 = D3LMap.svg.append("g").attr("class", "leaflet-zoom-hide");
-        D3LMap.g2 = D3LMap.svg.append("g").attr("class", "leaflet-zoom-hide");
-        D3LMap.g3 = D3LMap.svg.append("g").attr("class", "leaflet-zoom-hide");
+        D3LMap.g1 = D3LMap.svg.append("g").attr("class", "leaflet-zoom-hide").attr("id", "g1");
+        D3LMap.g2 = D3LMap.svg.append("g").attr("class", "leaflet-zoom-hide").attr("id", "g2");
+        D3LMap.g3 = D3LMap.svg.append("g").attr("class", "leaflet-zoom-hide").attr("id", "g3");
 
         /* geojson structure */
         D3LMap.geojson = {
@@ -422,14 +422,19 @@ MarkerObj.prototype.init = function() {
             .attr("id", function (d) {
                 return id + d.id; // assign a unique id so we can target for animation later
             })
-            .on('mouseover', D3LMap.tip.show)
-            .on('mouseout', D3LMap.tip.hide);
+            .on('mouseover', function(d) {
+                D3LMap.tip.attr('class', 'd3-tip fade-in').show(d)
+            })
+            .on('mouseout', function(d) {
+                D3LMap.tip.attr('class', 'd3-tip fade-out').show(d)
+                D3LMap.tip.hide();
+            });
 
         var reset = function () { update(feature); };
 
         D3LMap.map.on("viewreset", reset);
         update(feature);
-    });
+    }.bind(this));
 };
 
 MarkerObj.prototype.update = function(feat) {
