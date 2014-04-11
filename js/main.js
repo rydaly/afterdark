@@ -30,11 +30,20 @@ var D3LMap = {
     g3: undefined,
     circsize: 1,
     tip: undefined,
+    lineDurationMod: 10, // multiplier for duration of line drawing
 
     // vars for day timer and ui
     timer: undefined,
     dayStartTime: 0,
     timerSpeed: 33.2, // ( 24000 ms total or 1440 ticks total ) 60 minutes / hour * 24 seconds = 1440 ticks total - 24000/1440 = 16.6;
+
+    // colors
+    darkgrey: '#31302b',
+    lightgrey: '#989287',
+    blue: '#5fbdba',
+    yellow: '#edb03d',
+    green: '#a1bf58',
+    orange: '#f0672f',
 
     initMap: function () {
         D3LMap.toner = new L.TileLayer(D3LMap.tonerUrl, {
@@ -62,6 +71,9 @@ var D3LMap = {
 
         /* pick up the SVG from the map object */
         D3LMap.svg = d3.select("#map").select("svg");
+
+        /* insert a blending filter into the svg */
+        // D3LMap.svg.insert("filter").attr("id", "effect").insert("feBlend").attr("mode", "multiply").attr("in1", "BackgroundImage");
 
         /* bind tips to SVG */
         D3LMap.svg.call(D3LMap.tip);
@@ -149,7 +161,7 @@ var D3LMap = {
                     targEndOuter = data[idx].targ_circ_end_outer,
                     latLng = [strtLatLng, endLatLng],
                     uniqueID = data[idx].unique_id,
-                    tripduration = data[idx].tripduration * 2,
+                    tripduration = data[idx].tripduration * D3LMap.lineDurationMod,
                     startTime = data[idx].starttime.split(" ").pop(), // pop just the time off the end
                     startDelay = D3LMap.calcTimeDiff(startTime, D3LMap.dayStartTime.toString() + ":00") * 2000;
 
@@ -186,9 +198,10 @@ var D3LMap = {
                 .attr("id", function () {
                     return "path_" + theId;
                 })
-                .attr("stroke", "steelblue")
+                .attr("stroke", D3LMap.blue)
                 .attr("stroke-width", "2")
                 .attr("fill", "none")
+                .attr('opacity', 0.5)
                 .attr("stroke-dasharray", totalDistance + " " + totalDistance)
                 .attr("stroke-dashoffset", totalDistance)
                 .transition()
@@ -201,14 +214,13 @@ var D3LMap = {
                     return "pointer-events:none;";
                 })
                 .each("start", function () {
-                    D3LMap.animatePulse(start_circ_outer, start_circ_inner, "outgoing");
-                    setTimeout(D3LMap.animatePulse(end_circ_outer, end_circ_inner, "incoming"), actualDuration);
+                    D3LMap.animatePulse(start_circ_outer, start_circ_inner, "outgoing", actualDuration);
+                    setTimeout(D3LMap.animatePulse(end_circ_outer, end_circ_inner, "incoming", actualDuration), actualDuration);
                 })
                 .each("end", function () {
-                    // D3LMap.animatePulse(end_circ_inner, "incoming");
                     d3.select(this)
                         .transition()
-                        .delay(actualDuration)
+                        .delay(actualDuration / D3LMap.lineDurationMod * 2)
                         .duration(2000)
                         .ease('linear')
                         .attr('stroke', 'white')
@@ -218,7 +230,7 @@ var D3LMap = {
     },
 
     // re-hash this so that if it's incoming, it incs the innerTarget, vise versa
-    animatePulse: function (outerTarget, innerTarget, phase) {
+    animatePulse: function (outerTarget, innerTarget, phase, pulse_delay) {
         var outer_node = d3.select(outerTarget.node()),
             inner_node = d3.select(innerTarget.node()),
             parent_node = d3.select(outerTarget.node().parentNode),
@@ -232,13 +244,13 @@ var D3LMap = {
                         .append("circle")
                         .attr("cx", function () { return outer_node.attr('cx'); })
                         .attr("cy", function () { return outer_node.attr('cy'); })
-                        .attr("stroke", "blue")
+                        .attr("stroke", D3LMap.green)
                         .attr("stroke-width", "2")
                         .attr("fill", "none")
                         .attr('opacity', 0)
                         .attr("r", function () { return D3LMap.getCircSize() * 15; })
                         .transition()
-                        .duration(1500)
+                        .duration(1000)
                         .delay(0)
                         .ease('out')
                         .attr('opacity', 0.75)
@@ -249,10 +261,10 @@ var D3LMap = {
                     innerTarget
                         .attr('opacity', 0.75)
                         .transition()
-                        .duration(250)
-                        .delay(0)
+                        .duration(1000)
+                        .delay(pulse_delay / 100)
                         .ease('out')
-                        .attr("fill", "blue")
+                        .attr("fill", D3LMap.green)
                         // .attr('stroke-width', function () { return parseInt(target.attr('stroke-width')) + 1 })
                         // .attr('stroke', 'steelblue')
                         .attr('r', function () { return parseInt(innerTarget.attr('r')) + 3; });
@@ -264,13 +276,13 @@ var D3LMap = {
                         .append("circle")
                         .attr("cx", function () { return outer_node.attr('cx'); })
                         .attr("cy", function () { return outer_node.attr('cy'); })
-                        .attr("stroke", "yellow")
+                        .attr("stroke", D3LMap.orange)
                         .attr("stroke-width", "2")
                         .attr("fill", "none")
                         .attr('opacity', 0.75)
                         .attr("r", 0)
                         .transition()
-                        .duration(1500)
+                        .duration(1000)
                         .delay(0)
                         .ease('out')
                         .attr('opacity', 0)
@@ -279,12 +291,12 @@ var D3LMap = {
 
                     // modify the outer circle
                     outerTarget
-                        .attr('opacity', 1)
+                        .attr('opacity', 0.75)
                         .transition()
-                        .duration(250)
+                        .duration(1000)
                         .delay(0)
                         .ease('out')
-                        .attr('fill', 'yellow')
+                        .attr('fill', D3LMap.orange)
                         // .attr('stroke-width', function () {
                         //     var sw = parseInt(target.style('stroke-width'));
                         //         sw += 4;
