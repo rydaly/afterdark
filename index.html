@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset='utf-8'/>
+        <script type="text/javascript" src="//use.typekit.net/iqi0tnq.js"></script>
+        <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+        <title>Divvy After Dark</title>
+        <link rel="stylesheet" href="css/style.css">
+        <!--[if lte IE 8]>
+        <script src="js/ddr-ecma5-min.js"></script>
+        <![endif]-->
+        <!-- <link rel="stylesheet" href="css/leaflet.css" /> -->
+        <!-- <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.css" /> -->
+    </head>
+    <body>
+        <div id="splash">
+            <a href="#" class="go" onclick="splashOut('go');">GO</a>
+        </div>
+
+        <div id="progress-bar"></div>
+        
+        <div id="clockDisplay" class="clockStyle"></div>
+        
+        <div id="map"></div>
+
+        <script type="text/javascript" src="//dl1d2m8ri9v3j.cloudfront.net/releases/1.2.4/tracker.js" data-customer="b32ff1355c5c4f6aa5a2c9ca89224eee"></script>
+        <script type="text/javascript" src="js/lib/greensock/TweenLite.min.js"></script>
+        <script type="text/javascript" src="js/lib/greensock/easing/EasePack.min.js"></script>
+        <script type="text/javascript" src="js/lib/greensock/plugins/CSSPlugin.min.js"></script>
+        <script type="text/javascript" src="js/lib/leaflet/leaflet.js"></script>
+        <script type="text/javascript" src="js/lib/leaflet/leaflet.css.js"></script>
+        <script type="text/javascript" src="js/lib/leaflet/leaflet.markercluster.js"></script>
+        <script type="text/javascript" src="js/lib/leaflet/leaflet.providers.js"></script>
+        <script type="text/javascript" src="js/lib/leaflet/leaflet.hash.js"></script>
+        <script type="text/javascript" src="js/lib/leaflet/leaflet.geometryutil.js"></script>
+        <!-- <script type="text/javascript" src="js/lib/d3/d3.v3.min.js"></script> -->
+        <script type="text/javascript" src="bower_components/d3/d3.min.js"></script>
+        <script type="text/javascript" src="bower_components/d3-tip/index.js"></script>
+        <script type="text/javascript" src="js/correctingInterval.min.js"></script>
+        <script type="text/javascript" src="js/main.js"></script>
+        <script type="text/javascript">
+            
+            var splash = document.getElementById('splash');
+            var map = document.getElementById('map');
+
+            initMain(); // init app in the background
+
+            function splashOut(data) {
+                TweenLite.to(splash, 0.75, { autoAlpha:0, height:0, onComplete:runApp, onCompleteParams:[data] });
+                TweenLite.to(map, 0.75, { autoAlpha:1 });
+            };
+
+            function runApp(data) {
+                window.location.hash = data;
+                initMain();
+            };
+        </script>
+    </body>
+</html>
