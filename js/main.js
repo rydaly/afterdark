@@ -1,10 +1,12 @@
 /*
     TODO ::
 
-    * create up-front splash page that will initialize the app based on a date selected from a calendar
-    * create a scrubbable timeline that corresponds to clock? This will be considerably difficult
-    * stop clock after 24 hours and give option to reset or select another day.
+    * graph at the bottom that shows traffic amounts on a linear timeline
+    * line decay taking too long on some trips - I think because trips that end after midnight are being not calculated properly
+    * initialize the app based on a date selected from a calendar
+    * give option to reset or select another day.
     * stats - most overall traffic / busiest, most outgoing, most incoming - zoom and pan to station on click
+    * color key - incoming, outgoing, overlap
 */
 
 /* globals */
@@ -15,7 +17,7 @@ var D3LMap = {
     map: undefined,
     toner: undefined,
     tonerUrl: 'http://{s}.tile.stamen.com/toner-background/{z}/{x}/{y}.jpg',
-    tonerAttribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; ' + 'Map data {attribution.OpenStreetMap}',
+    //tonerAttribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; ' + 'Map data {attribution.OpenStreetMap}',
     vector: undefined,
 
     // vars for data
@@ -33,7 +35,6 @@ var D3LMap = {
     lineDurationMod: 10, // multiplier for duration of line drawing
 
     // vars for day timer and ui
-    timer: undefined,
     dayStartTime: 0,
     timerSpeed: 33.2, // ( 24000 ms total or 1440 ticks total ) 60 minutes / hour * 24 seconds = 1440 ticks total - 24000/1440 = 16.6;
 
@@ -109,17 +110,14 @@ var D3LMap = {
 
         D3LMap.divvyTimer.init(D3LMap.dayStartTime, D3LMap.timerSpeed);
         D3LMap.initTripPaths();
+    },
 
-        this.startAnimation = function () {
-            // add lines to leaflet layer
-            L.geoJson(D3LMap.geojson).addTo(D3LMap.map);
-            // draw the paths and start the timer
-            D3LMap.drawTripPaths(D3LMap.geojson);
-            D3LMap.divvyTimer.start();
-        };
-
-        // replace this with a callback later... will load when user selects day
-        D3LMap.timer = setTimeout(this.startAnimation, 2500);
+    startAnimation: function () {
+        // add lines to leaflet layer
+        L.geoJson(D3LMap.geojson).addTo(D3LMap.map);
+        // draw the paths and start the timer
+        D3LMap.drawTripPaths(D3LMap.geojson);
+        D3LMap.divvyTimer.start();
     },
 
     drawMarkers: function () {
@@ -345,6 +343,8 @@ var D3LMap = {
     },
 
     divvyTimer: {
+        inc: 0,
+        perc: 0,
         speed: 100,
         min: 0,
         hour: 0,
@@ -352,6 +352,7 @@ var D3LMap = {
         hourCount: 0,
         interval: undefined,
         node: document.getElementById("clockDisplay"),
+        progBar: document.getElementById("progress-bar"),
 
         init: function (starHour, speed) {
             this.hour = starHour;
@@ -360,8 +361,7 @@ var D3LMap = {
         },
 
         start: function () {
-            var that = this; // needs closure for proper scope
-
+            var that = this;
             this.interval = setCorrectingInterval(function () {
                 that.run();
             }, this.speed);
@@ -372,7 +372,11 @@ var D3LMap = {
         },
 
         run: function () {
+            this.inc++;
+            this.perc = this.inc / 1440 * 100;
             this.min++;
+
+            this.progBar.setAttribute("style","width:" + this.perc + "%");
 
             if (this.min === 60) {
                 this.min = 0;
@@ -465,10 +469,10 @@ MarkerObj.prototype.update = function(feat) {
 function initMain () {
     if (window.location.hash) {
         console.log(window.location.hash);
-        console.log('init map...');
-        D3LMap.initMap();
+        console.log('has hash...');
+        D3LMap.startAnimation();
     } else {
-        console.log("show splash");
+        console.log("no hash...");
         console.log(window.location.hash);
         D3LMap.initMap();
     }
