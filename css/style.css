@@ -90,8 +90,8 @@ body {
     font-size: 18px;
     line-height: 1;
     padding: 18px;
-    background: rgba(0, 0, 0, 0.75);
-    color: #eee;
+    background: rgba(35, 33, 29, 0.75);
+    color: #989287;
     border-radius: 5px;
     text-shadow: rgba(0, 0, 0, 0.25) 1px 1px 1px;
     box-shadow: rgba(0, 0, 0, 0.25) 1px 1px 2px 0;
@@ -114,7 +114,7 @@ body {
     font-size: 10px;
     width: 100%;
     line-height: 1;
-    color: rgba(0, 0, 0, 0.75);
+    color: rgba(35, 33, 29, 0.75);
     content: "\25BC";
     position: absolute;
     text-align: center;
@@ -183,13 +183,59 @@ circle {
     bottom: 0;
     left: 0;
     width: 0;
-    height: 4%;
-    background: #5fbdba;
-    opacity: 0.75;
+    height: 2%;
+    background: #56c2e6;
+    opacity: 0.85;
     z-index:11;
     pointer-events: none;
 }
 .leaflet-control-attribution {
     visibility: hidden;
     display: none;
+}
+
+#key {
+    position: absolute;
+    top: 75px;
+    right: 20px;
+    z-index: 9; 
+    width: auto;
+    height: 150px;
+    padding: 10px;
+    color: #989287;
+
+    font-size: inherit;
+    font-weight: inherit;
+    font-family: inherit;
+    font-style: inherit;
+    text-decoration: inherit;
+}
+
+#key ul {
+    list-style: none outside;
+}
+
+.key-circ {
+    position: relative;
+    line-height: 35px;
+}
+.key-circ > i {
+    display: inline-block;
+    border-radius: 10px;
+    mix-blend-mode: screen;
+    opacity: 0.75;
+}
+#key span {
+    font-size: 18px;
+    position: relative;
+    top: -3px;
+    left: 10px;
+}
+
+.incoming > i {
+    border: 10px solid #a1bf58;
+}
+
+.outgoing > i {
+    border: 10px solid #f0672f;
 }
