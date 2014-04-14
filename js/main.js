@@ -47,6 +47,7 @@ var D3LMap = {
     orange: '#f0672f',
 
     initMap: function () {
+        // console.log(D3LMap.map);
         D3LMap.toner = new L.TileLayer(D3LMap.tonerUrl, {
             maxZoom: 15,
             attribution: D3LMap.tonerAttribution
@@ -144,6 +145,9 @@ var D3LMap = {
                 d.targ_circ_start_outer = d3.select("#outer_circs_" + d.from_station_id);
                 d.targ_circ_end_inner = d3.select("#inner_circs_" + d.to_station_id);
                 d.targ_circ_end_outer = d3.select("#outer_circs_" + d.to_station_id);
+                
+                D3LMap.parseDate(d.starttime, d.stoptime);
+                // console.log(D3LMap.parseDate(d.starttime, d.stoptime));
             });
 
             convertToGeojson(collection.features);
@@ -177,6 +181,17 @@ var D3LMap = {
         }
     },
 
+    parseDate: function (start, end) {
+        var startform = start.split(' ')[0].replace(/-/g, '/'),
+            endform = end.split(' ')[0].replace(/-/g, '/'),
+            dStart = new Date(startform),
+            dEnd = new Date(endform),
+            dObj = [ dStart, dEnd ];
+
+            //console.log(dObj);
+            return dObj;
+    },
+
     drawTripPaths: function (data) {
         var feature = d3.selectAll('path');
 
@@ -204,7 +219,7 @@ var D3LMap = {
                 .attr("stroke-dashoffset", totalDistance)
                 .transition()
                 .delay(actualDelay)
-                .duration(actualDuration)
+                .duration(actualDuration * 2)
                 .ease('in-out')
                 .attr("stroke-dashoffset", 0)
                 .attr("style", function () {
@@ -213,16 +228,25 @@ var D3LMap = {
                 })
                 .each("start", function () {
                     D3LMap.animatePulse(start_circ_outer, start_circ_inner, "outgoing", actualDuration);
-                    setTimeout(D3LMap.animatePulse(end_circ_outer, end_circ_inner, "incoming", actualDuration), actualDuration);
-                })
-                .each("end", function () {
+                    // setTimeout(D3LMap.animatePulse(end_circ_outer, end_circ_inner, "incoming", actualDuration), actualDuration);
+                    D3LMap.animatePulse(end_circ_outer, end_circ_inner, "incoming", actualDuration / 25);
+                    // console.log(actualDuration);
                     d3.select(this)
                         .transition()
-                        .delay(actualDuration / D3LMap.lineDurationMod * 2)
+                        .delay(actualDuration / 5)
                         .duration(2000)
                         .ease('linear')
                         .attr('stroke', 'white')
                         .style("opacity", 0.1);
+                })
+                .each("end", function () {
+                    // d3.select(this)
+                    //     .transition()
+                    //     .delay(0)
+                    //     .duration(2000)
+                    //     .ease('linear')
+                    //     .attr('stroke', 'white')
+                    //     .style("opacity", 0.1);
                 });
         });
     },
@@ -249,7 +273,7 @@ var D3LMap = {
                         .attr("r", function () { return D3LMap.getCircSize() * 15; })
                         .transition()
                         .duration(1000)
-                        .delay(0)
+                        .delay(pulse_delay)
                         .ease('out')
                         .attr('opacity', 0.75)
                         .attr("r", function () { return 0; })
@@ -260,7 +284,7 @@ var D3LMap = {
                         .attr('opacity', 0.75)
                         .transition()
                         .duration(1000)
-                        .delay(pulse_delay / 100)
+                        .delay(pulse_delay + 100)
                         .ease('out')
                         .attr("fill", D3LMap.green)
                         // .attr('stroke-width', function () { return parseInt(target.attr('stroke-width')) + 1 })
@@ -280,7 +304,7 @@ var D3LMap = {
                         .attr('opacity', 0.75)
                         .attr("r", 0)
                         .transition()
-                        .duration(1000)
+                        .duration(750)
                         .delay(0)
                         .ease('out')
                         .attr('opacity', 0)
@@ -467,14 +491,16 @@ MarkerObj.prototype.update = function(feat) {
 };
 
 function initMain () {
-    if (window.location.hash) {
-        console.log(window.location.hash);
-        console.log('has hash...');
+    if (window.location.hash === '#go') {
+        // console.log(window.location.hash);
+        // console.log('has hash...');
         D3LMap.startAnimation();
-    } else {
-        console.log("no hash...");
-        console.log(window.location.hash);
-        D3LMap.initMap();
+    } else if (window.location.hash === '#init') {
+        // console.log("no hash...");
+        // console.log(window.location.hash);
+        if (D3LMap.map === undefined) {
+            D3LMap.initMap();
+        }
     }
 
 };

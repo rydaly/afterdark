@@ -6,6 +6,8 @@
         <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
         <title>Divvy After Dark</title>
         <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="css/datepicker/default.css" id="theme_base">
+        <link rel="stylesheet" href="css/datepicker/default.date.css" id="theme_date">
         <!--[if lte IE 8]>
         <script src="js/ddr-ecma5-min.js"></script>
         <![endif]-->
@@ -14,6 +16,7 @@
     </head>
     <body>
         <div id="splash">
+            <input id="demo__api-open-close" class="fieldset__input  picker__input" type="text" value="" placeholder="Pick a Date" readonly="" aria-haspopup="true" aria-expanded="false" aria-readonly="false" aria-owns="demo__api-open-close_root">
             <a href="#" class="go" onclick="splashOut('go');">GO</a>
         </div>
 
@@ -30,7 +33,10 @@
         
         <div id="map"></div>
 
-        <script type="text/javascript" src="//dl1d2m8ri9v3j.cloudfront.net/releases/1.2.4/tracker.js" data-customer="b32ff1355c5c4f6aa5a2c9ca89224eee"></script>
+        <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+        <script>window.jQuery||document.write('<script src="js/lib/datepicker/jquery.2.0.0.js"><\/script>')</script>
+        <script type="text/javascript" src="js/lib/datepicker/picker.js"></script>
+        <script type="text/javascript" src="js/lib/datepicker/picker.date.js"></script>
         <script type="text/javascript" src="js/lib/greensock/TweenLite.min.js"></script>
         <script type="text/javascript" src="js/lib/greensock/easing/EasePack.min.js"></script>
         <script type="text/javascript" src="js/lib/greensock/plugins/CSSPlugin.min.js"></script>
@@ -47,10 +53,15 @@
         <script type="text/javascript" src="js/main.js"></script>
         <script type="text/javascript">
             
+            window.onload = function() {
+                window.location.hash = 'init';
+                initMain(); // init app in the background
+
+                $('.picker__input').pickadate();
+            }
+
             var splash = document.getElementById('splash');
             var map = document.getElementById('map');
-
-            initMain(); // init app in the background
 
             function splashOut(data) {
                 TweenLite.to(splash, 0.75, { autoAlpha:0, height:0, onComplete:runApp, onCompleteParams:[data] });
@@ -61,6 +72,7 @@
                 window.location.hash = data;
                 initMain();
             };
+
         </script>
     </body>
 </html>
