@@ -1,10 +1,11 @@
-html { height: 100% }
+html { height: 100%; overflow: hidden; }
 body { 
     height: 100%; 
     margin: 0; 
     padding: 0;
     font-family: "brandon-grotesque", sans-serif;
     background: #31302b;
+    overflow: hidden;
 }
 #map{ background-color:#31302b; height: 100%; visibility: hidden; }
 .leaflet-layer { opacity: 0.1; }
@@ -133,6 +134,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
+    overflow: hidden;
     background-color: #31302b;
     z-index:10;
 }
@@ -188,6 +190,10 @@ body {
     top: 50%;
     left: 50%;
     margin: -100px 0 0 -130px;
+}
+
+.picker__holder {
+    overflow: hidden !important;
 }
 
 circle {
