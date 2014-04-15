@@ -16,8 +16,11 @@
     </head>
     <body>
         <div id="splash">
-            <input id="demo__api-open-close" class="fieldset__input  picker__input" type="text" value="" placeholder="Pick a Date" readonly="" aria-haspopup="true" aria-expanded="false" aria-readonly="false" aria-owns="demo__api-open-close_root">
+            
+            <input id="datepicker" class="datepicker  picker__input" type="text" value="" placeholder="Pick a Date" readonly="" aria-haspopup="true" aria-expanded="false" aria-readonly="false" aria-owns="demo__api-open-close_root">
+            
             <a href="#" class="go" onclick="splashOut('go');">GO</a>
+        
         </div>
 
         <div id="progress-bar"></div>
@@ -57,7 +60,39 @@
                 window.location.hash = 'init';
                 initMain(); // init app in the background
 
-                $('.picker__input').pickadate();
+                var picker_input = $('.datepicker'),
+                    
+                    picker = picker_input.pickadate({
+                        today: '',
+                        min: new Date(2013, 0, 1),
+                        max: new Date(2013, 11, 31),
+                        selectMonths: false,
+                        selectYears: false,
+                        format: 'dddd, mmm dd, yyyy',
+                        
+                        onOpen: function() {
+                            // console.log('Opened up!');
+                        },
+                        onClose: function() {
+                            // console.log('Closed now');
+                        },
+                        onRender: function() {
+                            // console.log('Just rendered anew');
+                        },
+                        onStart: function() {
+                            // console.log('Hello there :)');
+                        },
+                        onStop: function() {
+                            // console.log('See ya');
+                        },
+                        onSet: function(thingSet) {
+                            // console.log('Set stuff:', thingSet);
+                            picker_obj.off('set');
+                        }
+                    }),
+
+                    picker_obj = picker.pickadate('picker');
+                    picker_obj.set('view', [ 2013, 0, 1 ]);
             }
 
             var splash = document.getElementById('splash');
