@@ -193,18 +193,6 @@ transform: translate(0, 5px);
     left: 50%;
     margin: -100px 0 0 -130px;
 }
-.picker__holder {
-    overflow: hidden !important;
-}
-div[data-pick="1378875600000"] {
-    background: #ff0000;
-}
-div[data-pick="1371013200000"] {
-    background: #ff0000;
-}
-div[data-pick="1358316000000"] {
-    background: #ff0000;
-}
 
 circle {
     /*filter: url(#effect);*/

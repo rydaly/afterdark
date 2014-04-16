@@ -97,7 +97,7 @@
   content: " ";
   border-top: .5em solid transparent;
   border-bottom: .5em solid transparent;
-  border-right: 0.75em solid #000000;
+  border-right: 0.75em solid #222222;
   width: 0;
   height: 0;
   display: block;
@@ -105,12 +105,12 @@
 }
 .picker__nav--next:before {
   border-right: 0;
-  border-left: 0.75em solid #000000;
+  border-left: 0.75em solid #222222;
 }
 .picker__nav--prev:hover,
 .picker__nav--next:hover {
   cursor: pointer;
-  color: #000000;
+  color: #222222;
   background: #2ab2df;
 }
 .picker__nav--disabled,
@@ -119,8 +119,8 @@
 .picker__nav--disabled:before:hover {
   cursor: default;
   background: none;
-  border-right-color: #ff0000;
-  border-left-color: #ff0000;
+  border-right-color: #303030;
+  border-left-color: #303030;
 }
 /**
  * The calendar table of dates
@@ -198,7 +198,7 @@
 .picker__day--infocus:hover,
 .picker__day--outfocus:hover {
   cursor: pointer;
-  color: #000000;
+  color: #222222;
   background: #2ab2df;
 }
 .picker__day--highlighted:hover,
@@ -208,8 +208,8 @@
 }
 .picker__day--disabled,
 .picker__day--disabled:hover {
-  background: #ff0000;
-  border-color: #ff0000;
+  background: #303030;
+  border-color: #303030;
   color: #23231f;
   cursor: default;
 }
@@ -237,7 +237,7 @@
 .picker__button--today:hover,
 .picker__button--clear:hover {
   cursor: pointer;
-  color: #000000;
+  color: #222222;
   background: #2ab2df;
   border-bottom-color: #2ab2df;
 }
@@ -269,22 +269,7 @@
   vertical-align: top;
   font-size: 1.1em;
 }
-/**
- * Custom Tweeks
- */
-.picker__holder {
-    overflow: hidden;
-}
-div[data-pick="1378875600000"] {
-    background: #56c2e6;
-}
-div[data-pick="1371013200000"] {
-    background: #56c2e6;
-}
-div[data-pick="1358316000000"] {
-    background: #56c2e6;
-}
 
 /* ==========================================================================
-   $DEFAULT-DATE-PICKER
+   $CLASSIC-DATE-PICKER
    ========================================================================== */

@@ -1,0 +1,212 @@
+
+// ==========================================================================
+// $VARIABLES
+// ==========================================================================
+
+
+//
+// Base colors
+//
+@blue: #56c2e6;
+@blue-hover: darken(@blue, 10%);
+@black: #222;
+@white: #333;
+@light: #989287;
+@dark: #31302b;
+@green: #a1bf58;
+@yellow: #edb03d;
+
+
+//
+// Backgrounds
+//
+@bg-white: #333;
+@bg-grey-light: #111;
+
+
+//
+// Borders
+//
+@border-grey: #222;
+@border-grey-light: #222;
+@border-select: darken( @border-grey-light, 15% );
+
+
+//
+// Buttons
+//
+@clear-red: #f0672f;
+
+
+
+
+
+//
+// Picker base
+//
+
+// Make sure nothing is above the picker.
+@picker-z-index: 10000;
+
+// Animation speeds.
+@speed-animate-in: .25s;
+
+// Focused input border color.
+@input-active-border: @blue;
+
+// Typography.
+@base-font-size: 16px;
+@base-line-height: 1.2;
+
+// Corners.
+@picker-border-radius: 3px;
+
+// Drop shadows.
+@picker-box-shadow: 0 12px 36px 16px rgba(0,0,0,.24);
+@picker-box-shadow-light: 0 6px 18px 1px rgba(0,0,0,.12);
+
+// Height breakpoints.
+@breakpoint-tiny: 26.5em; // 424px @ 16px
+@breakpoint-small: 33.875em; // 542px @ 16px
+@breakpoint-medium: 40.125em; // 642px @ 16px
+@breakpoint-large: 46.75em; // 748px @ 16px
+
+// Width breakpoints.
+@breakpoint-width-tiny: 24.5em; // 392px @ 16px
+
+
+
+
+//
+// Date picker options
+//
+
+// The year and weekday labels.
+@year-weekday-label: #a1bf58;
+
+// “Today” tag indicators.
+@blue-tag: @blue;
+@disabled-tag: #f0672f;
+
+// Disabled things.. such as days, month nav, etc.
+@disabled-things-bg: darken(#333, 1%);
+@disabled-things-text: darken(@dark, 5%);
+@disabled-highlighted-things-bg: #bbb;
+
+
+
+
+
+//
+// Theme configurations
+//
+
+// The “default” min & max widths.
+@picker-min-width: 256px;
+@picker-max-width: 666px;
+
+// The time picker min & max widths.
+@time-min-width: @picker-min-width;
+@time-max-width: 320px;
+
+// The “classic” theme settings.
+@classic-max-width: @picker-max-width - 200px;
+@classic-min-width: @picker-min-width - 80px;
+@classic-max-height: 25em;
+@classic-box-shadow: 0 6px 18px 1px rgba(0,0,0,.12);
+
+
+
+
+
+
+
+
+// ==========================================================================
+// $MIXINS
+// ==========================================================================
+
+
+//
+// Common picker item states
+//
+
+// Highlighted.
+.picker-item-highlighted () {
+    background: @blue;
+    color: @white;
+}
+
+// Hovered.
+.picker-item-hovered () {
+    cursor: pointer;
+    color: @black;
+    background: @blue-hover;
+}
+
+// Selected.
+.picker-item-selected () {
+    border-color: @blue;
+}
+
+// Disabled.
+.picker-item-disabled () {
+    background: @disabled-things-bg;
+    border-color: @disabled-things-bg;
+    color: @disabled-things-text;
+    cursor: default;
+}
+
+
+
+
+//
+// Opacity
+//
+.opacity( @decimal ) {
+    @percent: @decimal * 100;
+    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=@{percent})";
+    filter: ~"alpha(opacity=@{percent})";
+    -moz-opacity: @decimal;
+         opacity: @decimal;
+}
+
+
+
+//
+// Vendor prefixes
+//
+.box-shadow ( @rest... ) {
+    -webkit-box-shadow: @rest;
+       -moz-box-shadow: @rest;
+            box-shadow: @rest;
+}
+.box-sizing ( @rest... ) {
+    -webkit-box-sizing: @rest;
+       -moz-box-sizing: @rest;
+            box-sizing: @rest;
+}
+.border-radius ( @rest... ) {
+    -webkit-border-radius: @rest;
+       -moz-border-radius: @rest;
+            border-radius: @rest;
+}
+.transition ( ... ) {
+    -webkit-transition: @arguments;
+       -moz-transition: @arguments;
+            transition: @arguments;
+}
+.transform ( @rest... ) {
+    -webkit-transform: @rest;
+       -moz-transform: @rest;
+            transform: @rest;
+}
+.user-select ( @rest... ) {
+    -webkit-user-select: @rest;
+       -moz-user-select: @rest;
+        -ms-user-select: @rest;
+            user-select: @rest;
+}
+
+
+

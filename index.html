@@ -6,8 +6,8 @@
         <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
         <title>Divvy After Dark</title>
         <link rel="stylesheet" href="css/style.css">
-        <link rel="stylesheet" href="css/datepicker/default.css" id="theme_base">
-        <link rel="stylesheet" href="css/datepicker/default.date.css" id="theme_date">
+        <link rel="stylesheet" href="js/lib/pickadate/lib/themes/default.css" id="theme_base">
+        <link rel="stylesheet" href="js/lib/pickadate/lib/themes/default.date.css" id="theme_date">
         <!--[if lte IE 8]>
         <script src="js/ddr-ecma5-min.js"></script>
         <![endif]-->
@@ -37,9 +37,9 @@
         <div id="map"></div>
 
         <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
-        <script>window.jQuery||document.write('<script src="js/lib/datepicker/jquery.2.0.0.js"><\/script>')</script>
-        <script type="text/javascript" src="js/lib/datepicker/picker.js"></script>
-        <script type="text/javascript" src="js/lib/datepicker/picker.date.js"></script>
+        <script>window.jQuery||document.write('<script src="js/lib/pickadate/tests/jquery.2.0.0.js"><\/script>')</script>
+        <script type="text/javascript" src="js/lib/pickadate/lib/compressed/picker.js"></script>
+        <script type="text/javascript" src="js/lib/pickadate/lib/compressed/picker.date.js"></script>
         <script type="text/javascript" src="js/lib/greensock/TweenLite.min.js"></script>
         <script type="text/javascript" src="js/lib/greensock/easing/EasePack.min.js"></script>
         <script type="text/javascript" src="js/lib/greensock/plugins/CSSPlugin.min.js"></script>
@@ -93,7 +93,7 @@
 
                     picker_obj = picker.pickadate('picker');
                     picker_obj.set('view', [ 2013, 0, 1 ]);
-            }
+            };
 
             var splash = document.getElementById('splash');
             var map = document.getElementById('map');
@@ -101,12 +101,12 @@
             function splashOut(data) {
                 TweenLite.to(splash, 0.75, { autoAlpha:0, height:0, onComplete:runApp, onCompleteParams:[data] });
                 TweenLite.to(map, 0.75, { autoAlpha:1 });
-            };
+            }
 
             function runApp(data) {
                 window.location.hash = data;
                 initMain();
-            };
+            }
 
         </script>
     </body>
