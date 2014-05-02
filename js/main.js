@@ -36,7 +36,7 @@ var D3LMap = {
 
     // vars for day timer and ui
     dayStartTime: 0,
-    timerSpeed: 33.2, // ( 24000 ms total or 1440 ticks total ) 60 minutes / hour * 24 seconds = 1440 ticks total - 24000/1440 = 16.6;
+    timerSpeed: 16.6, // ( 24000 ms total or 1440 ticks total ) 60 minutes / hour * 24 seconds = 1440 ticks total - 24000/1440 = 16.6;
 
     // colors
     darkgrey: '#31302b',
@@ -167,6 +167,7 @@ var D3LMap = {
                     startTime = data[idx].starttime.split(" ").pop(), // pop just the time off the end
                     startDelay = D3LMap.calcTimeDiff(startTime, D3LMap.dayStartTime.toString() + ":00") * 2000;
 
+                //console.log(startTime);
                 // push data into geo json object
                 D3LMap.geojson.features[0].geometry.coordinates.push(latLng);
                 D3LMap.geojson.features[0].properties.unique_ids.push(uniqueID);
@@ -187,8 +188,6 @@ var D3LMap = {
             dStart = new Date(startform),
             dEnd = new Date(endform),
             dObj = [ dStart, dEnd ];
-
-            //console.log(dObj);
             return dObj;
     },
 
@@ -217,38 +216,83 @@ var D3LMap = {
                 .attr('opacity', 0.5)
                 .attr("stroke-dasharray", totalDistance + " " + totalDistance)
                 .attr("stroke-dashoffset", totalDistance)
-                .transition()
-                .delay(actualDelay)
-                .duration(actualDuration * 2)
-                .ease('in-out')
-                .attr("stroke-dashoffset", 0)
                 .attr("style", function () {
-                    // return "stroke-dashoffset 5s ease-in-out; pointer-events:none;";
                     return "pointer-events:none;";
-                })
-                .each("start", function () {
-                    D3LMap.animatePulse(start_circ_outer, start_circ_inner, "outgoing", actualDuration);
-                    // setTimeout(D3LMap.animatePulse(end_circ_outer, end_circ_inner, "incoming", actualDuration), actualDuration);
-                    D3LMap.animatePulse(end_circ_outer, end_circ_inner, "incoming", actualDuration / 25);
-                    // console.log(actualDuration);
-                    d3.select(this)
-                        .transition()
-                        .delay(actualDuration / 5)
-                        .duration(2000)
-                        .ease('linear')
-                        .attr('stroke', 'white')
-                        .style("opacity", 0.1);
-                })
-                .each("end", function () {
-                    // d3.select(this)
-                    //     .transition()
-                    //     .delay(0)
-                    //     .duration(2000)
-                    //     .ease('linear')
-                    //     .attr('stroke', 'white')
-                    //     .style("opacity", 0.1);
                 });
         });
+    },
+
+    animatePath: function (id) {
+
+        // TODO :: 
+        // * add duration param and feed to animation time
+        // * fade out lines on complete
+
+        var test = d3.select("#path_" +  id)
+            // .transition()
+            //.delay(0)
+            //.duration(20000)
+            //.ease('in-out')
+            .attr("stroke-dashoffset", 0)
+            .attr("style", function () {
+                return "transition:stroke-dashoffset 1s ease-in-out; pointer-events:none;";
+            });
+            // .each("start", function () {
+            //     console.log('start :: ' + this);
+            // })
+            // .each("end", function () {
+            //     console.log('end :: ' + this);
+            // });
+            // .each("start", function () {
+            //     d3.select(this)
+            //         .transition()
+            //         .delay(actualDuration / 5)
+            //         .duration(2000)
+            //         .ease('linear')
+            //         .attr('stroke', 'white')
+            //         .style("opacity", 0.1);
+            // })
+            // .each("end", function () {
+            //     // d3.select(this)
+            //     //     .transition()
+            //     //     .delay(0)
+            //     //     .duration(2000)
+            //     //     .ease('linear')
+            //     //     .attr('stroke', 'white')
+            //     //     .style("opacity", 0.1);
+            // });
+
+            // .transition()
+            // .delay(actualDelay)
+            // .duration(actualDuration * 2)
+            // .ease('in-out')
+            // .attr("stroke-dashoffset", 0)
+            // .attr("style", function () {
+            //     // return "stroke-dashoffset 5s ease-in-out; pointer-events:none;";
+            //     return "pointer-events:none;";
+            // })
+            // .each("start", function () {
+            //     // D3LMap.animatePulse(start_circ_outer, start_circ_inner, "outgoing", actualDuration);
+            //         // setTimeout(D3LMap.animatePulse(end_circ_outer, end_circ_inner, "incoming", actualDuration), actualDuration);
+            //     // D3LMap.animatePulse(end_circ_outer, end_circ_inner, "incoming", actualDuration / 25);
+            //         // console.log(actualDuration);
+            //     d3.select(this)
+            //         .transition()
+            //         .delay(actualDuration / 5)
+            //         .duration(2000)
+            //         .ease('linear')
+            //         .attr('stroke', 'white')
+            //         .style("opacity", 0.1);
+            // })
+            // .each("end", function () {
+            //     // d3.select(this)
+            //     //     .transition()
+            //     //     .delay(0)
+            //     //     .duration(2000)
+            //     //     .ease('linear')
+            //     //     .attr('stroke', 'white')
+            //     //     .style("opacity", 0.1);
+            // });
     },
 
     // re-hash this so that if it's incoming, it incs the innerTarget, vise versa
@@ -377,6 +421,7 @@ var D3LMap = {
         interval: undefined,
         node: document.getElementById("clockDisplay"),
         progBar: document.getElementById("progress-bar"),
+        startTimeIndex: 0,
 
         init: function (starHour, speed) {
             this.hour = starHour;
@@ -388,11 +433,21 @@ var D3LMap = {
             var that = this;
             this.interval = setCorrectingInterval(function () {
                 that.run();
+                //that.update();
+                //that.draw();
             }, this.speed);
         },
 
         stop: function () {
             // don't need for now
+        },
+
+        update: function () {
+
+        },
+
+        draw: function () {
+
         },
 
         run: function () {
@@ -425,6 +480,30 @@ var D3LMap = {
             }
 
             this.node.innerText = ((this.hour < 10) ? " " + this.hour : this.hour) + ":" + ((this.min < 10) ? "0" + this.min : this.min) + " " + this.diem;
+            // console.log(this.node.innerText);
+            // console.log(D3LMap.geojson.features[0].properties.start_times[this.inc]);
+            //D3LMap.geojson.features[0].properties.start_times
+            var time = this.node.innerText;
+            var hours = Number(time.match(/^(\d+)/)[1]);
+            var minutes = Number(time.match(/:(\d+)/)[1]);
+            var AMPM = time.match(/\s(.*)$/)[1];
+            if(AMPM == "PM" && hours<12) hours = hours+12;
+            if(AMPM == "AM" && hours==12) hours = hours-12;
+            var sHours = hours.toString();
+            var sMinutes = minutes.toString();
+            if(hours<10) sHours = "0" + sHours;
+            if(minutes<10) sMinutes = "0" + sMinutes;
+            var conv = sHours + ":" + sMinutes;
+            
+            var dat = D3LMap.geojson.features[0].properties;
+            var thisfeature = d3.selectAll('path');
+
+            while ( conv === D3LMap.geojson.features[0].properties.start_times[this.startTimeIndex] ) {
+                D3LMap.animatePulse(dat.targ_circ_start_outer[this.startTimeIndex], dat.targ_circ_start_inner[this.startTimeIndex], "outgoing", dat.trip_durations[this.startTimeIndex]);
+                D3LMap.animatePulse(dat.targ_circ_end_outer[this.startTimeIndex], dat.targ_circ_end_inner[this.startTimeIndex], "incoming", dat.trip_durations[this.startTimeIndex] / 25);
+                D3LMap.animatePath(this.startTimeIndex);
+                this.startTimeIndex++;
+            }
         },
 
         getCurrentTime: function () {
@@ -463,10 +542,10 @@ MarkerObj.prototype.init = function() {
                 return id + d.id; // assign a unique id so we can target for animation later
             })
             .on('mouseover', function(d) {
-                D3LMap.tip.attr('class', 'd3-tip fade-in').show(d)
+                D3LMap.tip.attr('class', 'd3-tip fade-in').show(d);
             })
             .on('mouseout', function(d) {
-                D3LMap.tip.attr('class', 'd3-tip fade-out').show(d)
+                D3LMap.tip.attr('class', 'd3-tip fade-out').show(d);
                 D3LMap.tip.hide();
             });
 
@@ -494,7 +573,8 @@ function initMain () {
     if (window.location.hash === '#go') {
         // console.log(window.location.hash);
         // console.log('has hash...');
-        D3LMap.startAnimation();
+        setTimeout(D3LMap.startAnimation, 5000);
+        // D3LMap.startAnimation();
     } else if (window.location.hash === '#init') {
         // console.log("no hash...");
         // console.log(window.location.hash);
@@ -503,4 +583,4 @@ function initMain () {
         }
     }
 
-};
+}

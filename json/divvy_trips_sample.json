@@ -2,20 +2,6 @@
 "type": "FeatureCollection",
 "features": [
   {
-    "trip_id":21716,
-    "starttime":"2013-07-03 23:59",
-    "stoptime":"2013-07-04 00:09",
-    "bikeid":290,
-    "tripduration":574,
-    "from_station_id":51,
-    "from_station_name":"Clark St & Randolph St",
-    "to_station_id":80,
-    "to_station_name":"Aberdeen St & Madison St",
-    "usertype":"Subscriber",
-    "gender":"Male",
-    "birthday":1983
-  },
-  {
     "trip_id":21724,
     "starttime":"2013-07-04 00:23",
     "stoptime":"2013-07-04 00:31",
@@ -772,20 +758,6 @@
     "birthday":1973
   },
   {
-    "trip_id":22177,
-    "starttime":"2013-07-04 11:01",
-    "stoptime":"2013-07-04 11:13",
-    "bikeid":97,
-    "tripduration":745,
-    "from_station_id":48,
-    "from_station_name":"Larrabee St & Kingsbury St",
-    "to_station_id":350,
-    "to_station_name":"Ashland Ave & Chicago Ave",
-    "usertype":"Subscriber",
-    "gender":"Male",
-    "birthday":1978
-  },
-  {
     "trip_id":22191,
     "starttime":"2013-07-04 11:00",
     "stoptime":"2013-07-04 11:13",
@@ -798,6 +770,20 @@
     "usertype":"Subscriber",
     "gender":"Male",
     "birthday":1984
+  },
+  {
+    "trip_id":22177,
+    "starttime":"2013-07-04 11:01",
+    "stoptime":"2013-07-04 11:13",
+    "bikeid":97,
+    "tripduration":745,
+    "from_station_id":48,
+    "from_station_name":"Larrabee St & Kingsbury St",
+    "to_station_id":350,
+    "to_station_name":"Ashland Ave & Chicago Ave",
+    "usertype":"Subscriber",
+    "gender":"Male",
+    "birthday":1978
   },
   {
     "trip_id":22194,
@@ -1094,6 +1080,20 @@
     "birthday":1961
   },
   {
+    "trip_id":22540,
+    "starttime":"2013-07-04 12:17",
+    "stoptime":"2013-07-04 12:24",
+    "bikeid":592,
+    "tripduration":372,
+    "from_station_id":51,
+    "from_station_name":"Clark St & Randolph St",
+    "to_station_id":49,
+    "to_station_name":"Dearborn St & Monroe St",
+    "usertype":"Subscriber",
+    "gender":"Male",
+    "birthday":1980
+  },
+  {
     "trip_id":22532,
     "starttime":"2013-07-04 12:18",
     "stoptime":"2013-07-04 12:40",
@@ -1120,20 +1120,6 @@
     "usertype":"Subscriber",
     "gender":"Male",
     "birthday":1979
-  },
-  {
-    "trip_id":22540,
-    "starttime":"2013-07-04 12:17",
-    "stoptime":"2013-07-04 12:24",
-    "bikeid":592,
-    "tripduration":372,
-    "from_station_id":51,
-    "from_station_name":"Clark St & Randolph St",
-    "to_station_id":49,
-    "to_station_name":"Dearborn St & Monroe St",
-    "usertype":"Subscriber",
-    "gender":"Male",
-    "birthday":1980
   },
   {
     "trip_id":22566,
@@ -2396,20 +2382,6 @@
     "birthday":1987
   },
   {
-    "trip_id":24139,
-    "starttime":"2013-07-04 16:36",
-    "stoptime":"2013-07-04 17:03",
-    "bikeid":564,
-    "tripduration":1641,
-    "from_station_id":97,
-    "from_station_name":"Museum Campus",
-    "to_station_id":62,
-    "to_station_name":"McCormick Place",
-    "usertype":"Subscriber",
-    "gender":"Male",
-    "birthday":1975
-  },
-  {
     "trip_id":24163,
     "starttime":"2013-07-04 16:35",
     "stoptime":"2013-07-04 16:39",
@@ -2422,6 +2394,20 @@
     "usertype":"Subscriber",
     "gender":"Male",
     "birthday":1961
+  },
+  {
+    "trip_id":24139,
+    "starttime":"2013-07-04 16:36",
+    "stoptime":"2013-07-04 17:03",
+    "bikeid":564,
+    "tripduration":1641,
+    "from_station_id":97,
+    "from_station_name":"Museum Campus",
+    "to_station_id":62,
+    "to_station_name":"McCormick Place",
+    "usertype":"Subscriber",
+    "gender":"Male",
+    "birthday":1975
   },
   {
     "trip_id":24174,
