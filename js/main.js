@@ -6,7 +6,7 @@
     * initialize the app based on a date selected from a calendar
     * give option to reset or select another day.
     * stats - most overall traffic / busiest, most outgoing, most incoming - zoom and pan to station on click
-    * color key - incoming, outgoing, overlap
+    * add 3rd set of invisible station circles for cleaner rollovers 
 */
 
 /* globals */
@@ -32,7 +32,6 @@ var D3LMap = {
     g3: undefined,
     circsize: 1,
     tip: undefined,
-    lineDurationMod: 10, // multiplier for duration of line drawing
 
     // vars for day timer and ui
     dayStartTime: 0,
@@ -138,10 +137,6 @@ var D3LMap = {
             collection.features.forEach(function (d, idx) {
 
                 /* associate station id of trip with lat long of start and end stations */
-                
-                // TODO :: make sure .lat below is not undefined when I call it... getting a sporadic error because of this
-                // .lat is created on marker init - just above in drawMarkers()
-
                 d.start_point = new L.LatLng(D3LMap.stations[d.from_station_id].lat, D3LMap.stations[d.from_station_id].lng);
                 d.end_point = new L.LatLng(D3LMap.stations[d.to_station_id].lat, D3LMap.stations[d.to_station_id].lng);
                 d.unique_id = idx;
@@ -181,7 +176,7 @@ var D3LMap = {
                     targEndOuter = data[idx].targ_circ_end_outer,
                     latLng = [strtLatLng, endLatLng],
                     uniqueID = data[idx].unique_id,
-                    tripduration = data[idx].tripduration * D3LMap.lineDurationMod,
+                    tripduration = data[idx].tripduration,
                     startTime = sort_array[i].start_time;
 
                 // push data into geo json object
@@ -237,57 +232,21 @@ var D3LMap = {
     },
 
     animatePath: function (id, duration) {
-
-        // TODO ::
-        // * fade out lines on complete
-
         var test = d3.select("#path_" +  id)
             .transition()
             // .delay(0)
             // .ease('in-out')
             // .duration(duration)
             .attr("opacity", 0.1)
-            .attr("stroke", "white")
+            .attr("stroke", D3LMap.yellow)
             .attr("stroke-dashoffset", 0)
             .attr("style", function () {
-                var dur = (duration * 0.001).toString();
+                var dur = (duration * 0.01).toString();
                 return "pointer-events:none; transition: stroke-dashoffset " + dur + "s ease-in-out, opacity 2s " + dur + "s, stroke 2s " + dur + "s;";
             })
             .each("start", function () {
-                // put some code here... if you want to 
+                // do something here... if you want to 
             });
-
-            // .transition()
-            // .delay(actualDelay)
-            // .duration(actualDuration * 2)
-            // .ease('in-out')
-            // .attr("stroke-dashoffset", 0)
-            // .attr("style", function () {
-            //     // return "stroke-dashoffset 5s ease-in-out; pointer-events:none;";
-            //     return "pointer-events:none;";
-            // })
-            // .each("start", function () {
-            //     // D3LMap.animatePulse(start_circ_outer, start_circ_inner, "outgoing", actualDuration);
-            //         // setTimeout(D3LMap.animatePulse(end_circ_outer, end_circ_inner, "incoming", actualDuration), actualDuration);
-            //     // D3LMap.animatePulse(end_circ_outer, end_circ_inner, "incoming", actualDuration / 25);
-            //         // console.log(actualDuration);
-            //     d3.select(this)
-            //         .transition()
-            //         .delay(actualDuration / 5)
-            //         .duration(2000)
-            //         .ease('linear')
-            //         .attr('stroke', 'white')
-            //         .style("opacity", 0.1);
-            // })
-            // .each("end", function () {
-            //     // d3.select(this)
-            //     //     .transition()
-            //     //     .delay(0)
-            //     //     .duration(2000)
-            //     //     .ease('linear')
-            //     //     .attr('stroke', 'white')
-            //     //     .style("opacity", 0.1);
-            // });
     },
 
     // re-hash this so that if it's incoming, it incs the innerTarget, vise versa
@@ -311,7 +270,7 @@ var D3LMap = {
                         .attr('opacity', 0)
                         .attr("r", function () { return D3LMap.getCircSize() * 15; })
                         .transition()
-                        .duration(1000)
+                        .duration(750)
                         .delay(pulse_delay)
                         .ease('out')
                         .attr('opacity', 0.75)
@@ -322,8 +281,8 @@ var D3LMap = {
                     innerTarget
                         .attr('opacity', 0.75)
                         .transition()
-                        .duration(1000)
-                        .delay(pulse_delay + 500)
+                        .duration(750)
+                        .delay(pulse_delay + 250)
                         .ease('out')
                         .attr("fill", D3LMap.green)
                         // .attr('stroke-width', function () { return parseInt(target.attr('stroke-width')) + 1 })
@@ -354,21 +313,13 @@ var D3LMap = {
                     outerTarget
                         .attr('opacity', 0.75)
                         .transition()
-                        .duration(1000)
+                        .duration(750)
                         .delay(0)
                         .ease('out')
                         .attr('fill', D3LMap.orange)
-                        // .attr('stroke-width', function () {
-                        //     var sw = parseInt(target.style('stroke-width'));
-                        //         sw += 4;
-                        //         console.log(sw);
-                        //     return sw;
-                        // })
-                        // .attr('r', function () { return parseInt(target.attr('r')) + 2; });
                         .attr('r', function () {
                             return parseInt(outerTarget.attr('r')) + 3;
                         });
-                        // .each("end", function(){ console.log( parseInt(target.style('stroke-width')) + 4 ); });
                 break;
         }
     },
@@ -457,7 +408,7 @@ var D3LMap = {
 
             while ( conv === dat.start_times[this.startTimeIndex] ) {
                 D3LMap.animatePulse(dat.targ_circ_start_outer[this.startTimeIndex], dat.targ_circ_start_inner[this.startTimeIndex], "outgoing", 0);
-                D3LMap.animatePulse(dat.targ_circ_end_outer[this.startTimeIndex], dat.targ_circ_end_inner[this.startTimeIndex], "incoming", dat.trip_durations[this.startTimeIndex] * 0.1);
+                D3LMap.animatePulse(dat.targ_circ_end_outer[this.startTimeIndex], dat.targ_circ_end_inner[this.startTimeIndex], "incoming", dat.trip_durations[this.startTimeIndex] * 1.5);
                 D3LMap.animatePath(this.startTimeIndex, dat.trip_durations[this.startTimeIndex]);
                 this.startTimeIndex++;
             }
