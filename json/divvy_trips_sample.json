@@ -16,6 +16,34 @@
     "birthday":1970
   },
   {
+    "trip_id":21777,
+    "starttime":"2013-07-04 06:05",
+    "stoptime":"2013-07-04 06:26",
+    "bikeid":406,
+    "tripduration":1211,
+    "from_station_id":28,
+    "from_station_name":"Larrabee St & Menomonee St",
+    "to_station_id":75,
+    "to_station_name":"Canal St & Jackson Blvd",
+    "usertype":"Subscriber",
+    "gender":"Male",
+    "birthday":1965
+  },
+  {
+    "trip_id":21786,
+    "starttime":"2013-07-04 06:46",
+    "stoptime":"2013-07-04 06:51",
+    "bikeid":320,
+    "tripduration":288,
+    "from_station_id":121,
+    "from_station_name":"Blackstone Ave & Hyde Park Blvd",
+    "to_station_id":62,
+    "to_station_name":"McCormick Place",
+    "usertype":"Subscriber",
+    "gender":"Male",
+    "birthday":1978
+  },
+  {
     "trip_id":21732,
     "starttime":"2013-07-04 00:33",
     "stoptime":"2013-07-04 00:45",
@@ -56,34 +84,6 @@
     "usertype":"Subscriber",
     "gender":"Male",
     "birthday":1983
-  },
-  {
-    "trip_id":21777,
-    "starttime":"2013-07-04 06:05",
-    "stoptime":"2013-07-04 06:26",
-    "bikeid":406,
-    "tripduration":1211,
-    "from_station_id":28,
-    "from_station_name":"Larrabee St & Menomonee St",
-    "to_station_id":75,
-    "to_station_name":"Canal St & Jackson Blvd",
-    "usertype":"Subscriber",
-    "gender":"Male",
-    "birthday":1965
-  },
-  {
-    "trip_id":21786,
-    "starttime":"2013-07-04 06:46",
-    "stoptime":"2013-07-04 06:51",
-    "bikeid":320,
-    "tripduration":288,
-    "from_station_id":121,
-    "from_station_name":"Blackstone Ave & Hyde Park Blvd",
-    "to_station_id":62,
-    "to_station_name":"McCormick Place",
-    "usertype":"Subscriber",
-    "gender":"Male",
-    "birthday":1978
   },
   {
     "trip_id":21789,
@@ -154,6 +154,34 @@
     "usertype":"Subscriber",
     "gender":"Male",
     "birthday":1983
+  },
+  {
+    "trip_id":21988,
+    "starttime":"2013-07-04 09:49",
+    "stoptime":"2013-07-04 10:14",
+    "bikeid":624,
+    "tripduration":1479,
+    "from_station_id":34,
+    "from_station_name":"Cannon Dr & Fullerton Ave",
+    "to_station_id":47,
+    "to_station_name":"State St & Kinzie St",
+    "usertype":"Subscriber",
+    "gender":"Male",
+    "birthday":1984
+  },
+  {
+    "trip_id":21989,
+    "starttime":"2013-07-04 09:49",
+    "stoptime":"2013-07-04 09:59",
+    "bikeid":215,
+    "tripduration":564,
+    "from_station_id":26,
+    "from_station_name":"McClurg Ct & Illinois St",
+    "to_station_id":53,
+    "to_station_name":"Wells St & Erie St",
+    "usertype":"Subscriber",
+    "gender":"Male",
+    "birthday":1985
   },
   {
     "trip_id":21817,
@@ -408,20 +436,6 @@
     "birthday":1968
   },
   {
-    "trip_id":21935,
-    "starttime":"2013-07-04 09:28",
-    "stoptime":"2013-07-04 09:41",
-    "bikeid":76,
-    "tripduration":775,
-    "from_station_id":85,
-    "from_station_name":"Michigan Ave & Oak St",
-    "to_station_id":90,
-    "to_station_name":"Millennium Park",
-    "usertype":"Subscriber",
-    "gender":"Male",
-    "birthday":1977
-  },
-  {
     "trip_id":21945,
     "starttime":"2013-07-04 09:29",
     "stoptime":"2013-07-04 09:35",
@@ -504,34 +518,6 @@
     "usertype":"Subscriber",
     "gender":"Male",
     "birthday":1988
-  },
-  {
-    "trip_id":21988,
-    "starttime":"2013-07-04 09:49",
-    "stoptime":"2013-07-04 10:14",
-    "bikeid":624,
-    "tripduration":1479,
-    "from_station_id":34,
-    "from_station_name":"Cannon Dr & Fullerton Ave",
-    "to_station_id":47,
-    "to_station_name":"State St & Kinzie St",
-    "usertype":"Subscriber",
-    "gender":"Male",
-    "birthday":1984
-  },
-  {
-    "trip_id":21989,
-    "starttime":"2013-07-04 09:49",
-    "stoptime":"2013-07-04 09:59",
-    "bikeid":215,
-    "tripduration":564,
-    "from_station_id":26,
-    "from_station_name":"McClurg Ct & Illinois St",
-    "to_station_id":53,
-    "to_station_name":"Wells St & Erie St",
-    "usertype":"Subscriber",
-    "gender":"Male",
-    "birthday":1985
   },
   {
     "trip_id":22003,
@@ -686,6 +672,20 @@
     "usertype":"Subscriber",
     "gender":"Male",
     "birthday":1971
+  },
+  {
+    "trip_id":21935,
+    "starttime":"2013-07-04 09:28",
+    "stoptime":"2013-07-04 09:41",
+    "bikeid":76,
+    "tripduration":775,
+    "from_station_id":85,
+    "from_station_name":"Michigan Ave & Oak St",
+    "to_station_id":90,
+    "to_station_name":"Millennium Park",
+    "usertype":"Subscriber",
+    "gender":"Male",
+    "birthday":1977
   },
   {
     "trip_id":22129,
@@ -1808,34 +1808,6 @@
     "birthday":1988
   },
   {
-    "trip_id":23407,
-    "starttime":"2013-07-04 14:38",
-    "stoptime":"2013-07-04 15:00",
-    "bikeid":174,
-    "tripduration":1330,
-    "from_station_id":20,
-    "from_station_name":"Sheffield Ave & Kingsbury St",
-    "to_station_id":47,
-    "to_station_name":"State St & Kinzie St",
-    "usertype":"Subscriber",
-    "gender":"Male",
-    "birthday":1978
-  },
-  {
-    "trip_id":23432,
-    "starttime":"2013-07-04 14:42",
-    "stoptime":"2013-07-04 14:51",
-    "bikeid":14,
-    "tripduration":521,
-    "from_station_id":76,
-    "from_station_name":"Lake Shore Dr & Monroe St",
-    "to_station_id":81,
-    "to_station_name":"Daley Center Plaza",
-    "usertype":"Subscriber",
-    "gender":"Male",
-    "birthday":1976
-  },
-  {
     "trip_id":23435,
     "starttime":"2013-07-04 14:43",
     "stoptime":"2013-07-04 15:04",
@@ -1862,34 +1834,6 @@
     "usertype":"Subscriber",
     "gender":"Male",
     "birthday":1964
-  },
-  {
-    "trip_id":23454,
-    "starttime":"2013-07-04 14:45",
-    "stoptime":"2013-07-04 15:17",
-    "bikeid":752,
-    "tripduration":1945,
-    "from_station_id":52,
-    "from_station_name":"Michigan Ave & Lake St",
-    "to_station_id":85,
-    "to_station_name":"Michigan Ave & Oak St",
-    "usertype":"Subscriber",
-    "gender":"Male",
-    "birthday":1983
-  },
-  {
-    "trip_id":23459,
-    "starttime":"2013-07-04 14:45",
-    "stoptime":"2013-07-04 15:08",
-    "bikeid":583,
-    "tripduration":1390,
-    "from_station_id":34,
-    "from_station_name":"Cannon Dr & Fullerton Ave",
-    "to_station_id":51,
-    "to_station_name":"Clark St & Randolph St",
-    "usertype":"Subscriber",
-    "gender":"Male",
-    "birthday":1977
   },
   {
     "trip_id":23464,
@@ -2254,6 +2198,34 @@
     "usertype":"Subscriber",
     "gender":"Male",
     "birthday":1961
+  },
+  {
+    "trip_id":23454,
+    "starttime":"2013-07-04 14:45",
+    "stoptime":"2013-07-04 15:17",
+    "bikeid":752,
+    "tripduration":1945,
+    "from_station_id":52,
+    "from_station_name":"Michigan Ave & Lake St",
+    "to_station_id":85,
+    "to_station_name":"Michigan Ave & Oak St",
+    "usertype":"Subscriber",
+    "gender":"Male",
+    "birthday":1983
+  },
+  {
+    "trip_id":23459,
+    "starttime":"2013-07-04 14:45",
+    "stoptime":"2013-07-04 15:08",
+    "bikeid":583,
+    "tripduration":1390,
+    "from_station_id":34,
+    "from_station_name":"Cannon Dr & Fullerton Ave",
+    "to_station_id":51,
+    "to_station_name":"Clark St & Randolph St",
+    "usertype":"Subscriber",
+    "gender":"Male",
+    "birthday":1977
   },
   {
     "trip_id":24051,
@@ -2912,6 +2884,34 @@
     "usertype":"Subscriber",
     "gender":"Male",
     "birthday":1986
+  },
+  {
+    "trip_id":23407,
+    "starttime":"2013-07-04 14:38",
+    "stoptime":"2013-07-04 15:00",
+    "bikeid":174,
+    "tripduration":1330,
+    "from_station_id":20,
+    "from_station_name":"Sheffield Ave & Kingsbury St",
+    "to_station_id":47,
+    "to_station_name":"State St & Kinzie St",
+    "usertype":"Subscriber",
+    "gender":"Male",
+    "birthday":1978
+  },
+  {
+    "trip_id":23432,
+    "starttime":"2013-07-04 14:42",
+    "stoptime":"2013-07-04 14:51",
+    "bikeid":14,
+    "tripduration":521,
+    "from_station_id":76,
+    "from_station_name":"Lake Shore Dr & Monroe St",
+    "to_station_id":81,
+    "to_station_name":"Daley Center Plaza",
+    "usertype":"Subscriber",
+    "gender":"Male",
+    "birthday":1976
   },
   {
     "trip_id":24918,

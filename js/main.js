@@ -36,7 +36,7 @@ var D3LMap = {
 
     // vars for day timer and ui
     dayStartTime: 0,
-    timerSpeed: 16.6, // ( 24000 ms total or 1440 ticks total ) 60 minutes / hour * 24 seconds = 1440 ticks total - 24000/1440 = 16.6;
+    timerSpeed: 33.2,// 16.6 = 1 second per hour, so 16.6 here will run for 24 seconds
 
     // colors
     darkgrey: '#31302b',
@@ -101,16 +101,13 @@ var D3LMap = {
                     'targ_circ_start_inner': [],
                     'targ_circ_start_outer': [],
                     'targ_circ_end_inner': [],
-                    'targ_circ_end_outer': [],
-                    'start_delays': []
+                    'targ_circ_end_outer': []
                 }
             }]
         };
 
-        D3LMap.drawMarkers();
-
+        D3LMap.drawMarkers(D3LMap.initTripPaths);
         D3LMap.divvyTimer.init(D3LMap.dayStartTime, D3LMap.timerSpeed);
-        D3LMap.initTripPaths();
     },
 
     startAnimation: function () {
@@ -121,7 +118,7 @@ var D3LMap = {
         D3LMap.divvyTimer.start();
     },
 
-    drawMarkers: function () {
+    drawMarkers: function (callback) {
         "use strict";
         var circs_layer1 = new MarkerObj(D3LMap.g1, "pulse_circs_"),
             circs_layer2 = new MarkerObj(D3LMap.g2, "outer_circs_"),
@@ -130,6 +127,9 @@ var D3LMap = {
             circs_layer1.init();
             circs_layer2.init();
             circs_layer3.init();
+
+        setTimeout(callback, 1000);
+        // callback();
     },
 
     initTripPaths: function () {
@@ -138,6 +138,10 @@ var D3LMap = {
             collection.features.forEach(function (d, idx) {
 
                 /* associate station id of trip with lat long of start and end stations */
+                
+                // TODO :: make sure .lat below is not undefined when I call it... getting a sporadic error because of this
+                // .lat is created on marker init - just above in drawMarkers()
+
                 d.start_point = new L.LatLng(D3LMap.stations[d.from_station_id].lat, D3LMap.stations[d.from_station_id].lng);
                 d.end_point = new L.LatLng(D3LMap.stations[d.to_station_id].lat, D3LMap.stations[d.to_station_id].lng);
                 d.unique_id = idx;
@@ -154,7 +158,21 @@ var D3LMap = {
         });
 
         function convertToGeojson(data) {
+            var sort_array = [];
+
+            // grab each start time, push to array so we sort data by start time
             data.forEach(function(d, idx) {
+                sort_array.push({ id:data[idx].unique_id, start_time:data[idx].starttime.split(' ').pop() }); // split and pop just the time off the end
+            });
+            sort_array.sort( function(a,b) {
+                if(a.start_time < b.start_time) return -1;
+                if(a.start_time > b.start_time) return 1;
+                return 0;
+            });
+
+            // loop through data and push to geojson with our new sort order
+            for(var i = 0; i < sort_array.length; i++) {
+                var idx = sort_array[i].id;
                 var strtLatLng = [data[idx].start_point.lng, data[idx].start_point.lat],
                     endLatLng = [data[idx].end_point.lng, data[idx].end_point.lat],
                     targStartInner = data[idx].targ_circ_start_inner,
@@ -164,10 +182,8 @@ var D3LMap = {
                     latLng = [strtLatLng, endLatLng],
                     uniqueID = data[idx].unique_id,
                     tripduration = data[idx].tripduration * D3LMap.lineDurationMod,
-                    startTime = data[idx].starttime.split(" ").pop(), // pop just the time off the end
-                    startDelay = D3LMap.calcTimeDiff(startTime, D3LMap.dayStartTime.toString() + ":00") * 2000;
+                    startTime = sort_array[i].start_time;
 
-                //console.log(startTime);
                 // push data into geo json object
                 D3LMap.geojson.features[0].geometry.coordinates.push(latLng);
                 D3LMap.geojson.features[0].properties.unique_ids.push(uniqueID);
@@ -177,8 +193,7 @@ var D3LMap = {
                 D3LMap.geojson.features[0].properties.targ_circ_end_inner.push(targEndInner);
                 D3LMap.geojson.features[0].properties.targ_circ_end_outer.push(targEndOuter);
                 D3LMap.geojson.features[0].properties.start_times.push(startTime);
-                D3LMap.geojson.features[0].properties.start_delays.push(startDelay);
-            });
+            }
         }
     },
 
@@ -203,8 +218,7 @@ var D3LMap = {
                 end_circ_inner = data.features[0].properties.targ_circ_end_inner[idx],
                 end_circ_outer = data.features[0].properties.targ_circ_end_outer[idx],
                 totalDistance = L.GeometryUtil.length([start_latlng, end_latlng]),
-                actualDuration = data.features[0].properties.trip_durations[idx],
-                actualDelay = data.features[0].properties.start_delays[idx];
+                actualDuration = data.features[0].properties.trip_durations[idx];
 
             d3.select(this)
                 .attr("id", function () {
@@ -222,45 +236,26 @@ var D3LMap = {
         });
     },
 
-    animatePath: function (id) {
+    animatePath: function (id, duration) {
 
-        // TODO :: 
-        // * add duration param and feed to animation time
+        // TODO ::
         // * fade out lines on complete
 
         var test = d3.select("#path_" +  id)
-            // .transition()
-            //.delay(0)
-            //.duration(20000)
-            //.ease('in-out')
+            .transition()
+            // .delay(0)
+            // .ease('in-out')
+            // .duration(duration)
+            .attr("opacity", 0.1)
+            .attr("stroke", "white")
             .attr("stroke-dashoffset", 0)
             .attr("style", function () {
-                return "transition:stroke-dashoffset 1s ease-in-out; pointer-events:none;";
+                var dur = (duration * 0.001).toString();
+                return "pointer-events:none; transition: stroke-dashoffset " + dur + "s ease-in-out, opacity 2s " + dur + "s, stroke 2s " + dur + "s;";
+            })
+            .each("start", function () {
+                // put some code here... if you want to 
             });
-            // .each("start", function () {
-            //     console.log('start :: ' + this);
-            // })
-            // .each("end", function () {
-            //     console.log('end :: ' + this);
-            // });
-            // .each("start", function () {
-            //     d3.select(this)
-            //         .transition()
-            //         .delay(actualDuration / 5)
-            //         .duration(2000)
-            //         .ease('linear')
-            //         .attr('stroke', 'white')
-            //         .style("opacity", 0.1);
-            // })
-            // .each("end", function () {
-            //     // d3.select(this)
-            //     //     .transition()
-            //     //     .delay(0)
-            //     //     .duration(2000)
-            //     //     .ease('linear')
-            //     //     .attr('stroke', 'white')
-            //     //     .style("opacity", 0.1);
-            // });
 
             // .transition()
             // .delay(actualDelay)
@@ -328,7 +323,7 @@ var D3LMap = {
                         .attr('opacity', 0.75)
                         .transition()
                         .duration(1000)
-                        .delay(pulse_delay + 100)
+                        .delay(pulse_delay + 500)
                         .ease('out')
                         .attr("fill", D3LMap.green)
                         // .attr('stroke-width', function () { return parseInt(target.attr('stroke-width')) + 1 })
@@ -382,34 +377,6 @@ var D3LMap = {
         return D3LMap.circsize / 1400 * Math.pow(2, D3LMap.map.getZoom());
     },
 
-    calcTimeDiff: function (star, en) {
-        var start = star,
-            end = en,
-            hours = end.split(':')[0] - start.split(':')[0],
-            minutes = end.split(':')[1] - start.split(':')[1],
-            minFraction = 0,
-            conversion = 0;
-
-        if (minutes < 0) {
-            hours--;
-            minutes = 60 + minutes;
-        }
-
-        minFraction = minutes / 60;
-        conversion = hours + minFraction;
-
-        if (conversion < 0) {
-            // if negative, make positive
-            conversion = Math.abs(conversion);
-        } else {
-            // offset numbers based on dayStartTime if positive
-            conversion = 24 - conversion;
-        }
-
-        // console.log(conversion);
-        return conversion;
-    },
-
     divvyTimer: {
         inc: 0,
         perc: 0,
@@ -433,21 +400,11 @@ var D3LMap = {
             var that = this;
             this.interval = setCorrectingInterval(function () {
                 that.run();
-                //that.update();
-                //that.draw();
             }, this.speed);
         },
 
         stop: function () {
             // don't need for now
-        },
-
-        update: function () {
-
-        },
-
-        draw: function () {
-
         },
 
         run: function () {
@@ -498,10 +455,10 @@ var D3LMap = {
             var dat = D3LMap.geojson.features[0].properties;
             var thisfeature = d3.selectAll('path');
 
-            while ( conv === D3LMap.geojson.features[0].properties.start_times[this.startTimeIndex] ) {
-                D3LMap.animatePulse(dat.targ_circ_start_outer[this.startTimeIndex], dat.targ_circ_start_inner[this.startTimeIndex], "outgoing", dat.trip_durations[this.startTimeIndex]);
-                D3LMap.animatePulse(dat.targ_circ_end_outer[this.startTimeIndex], dat.targ_circ_end_inner[this.startTimeIndex], "incoming", dat.trip_durations[this.startTimeIndex] / 25);
-                D3LMap.animatePath(this.startTimeIndex);
+            while ( conv === dat.start_times[this.startTimeIndex] ) {
+                D3LMap.animatePulse(dat.targ_circ_start_outer[this.startTimeIndex], dat.targ_circ_start_inner[this.startTimeIndex], "outgoing", 0);
+                D3LMap.animatePulse(dat.targ_circ_end_outer[this.startTimeIndex], dat.targ_circ_end_inner[this.startTimeIndex], "incoming", dat.trip_durations[this.startTimeIndex] * 0.1);
+                D3LMap.animatePath(this.startTimeIndex, dat.trip_durations[this.startTimeIndex]);
                 this.startTimeIndex++;
             }
         },
@@ -573,8 +530,7 @@ function initMain () {
     if (window.location.hash === '#go') {
         // console.log(window.location.hash);
         // console.log('has hash...');
-        setTimeout(D3LMap.startAnimation, 5000);
-        // D3LMap.startAnimation();
+        D3LMap.startAnimation();
     } else if (window.location.hash === '#init') {
         // console.log("no hash...");
         // console.log(window.location.hash);
