@@ -123,9 +123,9 @@ var D3LMap = {
             circs_layer2 = new MarkerObj(D3LMap.g2, "outer_circs_"),
             circs_layer3 = new MarkerObj(D3LMap.g3, "inner_circs_");
 
-            circs_layer1.init();
-            circs_layer2.init();
-            circs_layer3.init();
+            circs_layer1.init(false);
+            circs_layer2.init(true);
+            circs_layer3.init(true);
 
         setTimeout(callback, 1000);
         // callback();
@@ -249,7 +249,6 @@ var D3LMap = {
             });
     },
 
-    // re-hash this so that if it's incoming, it incs the innerTarget, vise versa
     animatePulse: function (outerTarget, innerTarget, phase, pulse_delay) {
         var outer_node = d3.select(outerTarget.node()),
             inner_node = d3.select(innerTarget.node()),
@@ -427,11 +426,12 @@ function MarkerObj(group, id) {
     this.feature = undefined;
 }
 
-MarkerObj.prototype.init = function() {
+MarkerObj.prototype.init = function(mouseEvents) {
     var group = this.group,
         id = this.id,
         feature = this.feature,
         update = this.update;
+        //d3.select(outerTarget.node().parentNode),
 
     d3.json(this.dataPath, function (collection) {
         /* Add a LatLng object to each item in the dataset - only need to do this once */
@@ -448,14 +448,23 @@ MarkerObj.prototype.init = function() {
             .attr('r', 0)
             .attr("id", function (d) {
                 return id + d.id; // assign a unique id so we can target for animation later
-            })
-            .on('mouseover', function(d) {
-                D3LMap.tip.attr('class', 'd3-tip fade-in').show(d);
-            })
-            .on('mouseout', function(d) {
-                D3LMap.tip.attr('class', 'd3-tip fade-out').show(d);
-                D3LMap.tip.hide();
             });
+            // TODO :: assign classes here for hiding and showing based on data points
+
+        if(mouseEvents) {
+            feature
+                .on('mouseover', function(d) {
+                    //inId = d3.event.target.id.split('_').pop();
+                    // D3LMap.tip.attr('class', 'd3-tip fade-in').show(d);
+                    D3LMap.tip.show(d);
+                    
+                })
+                .on('mouseout', function(d) {
+                    // outId = d3.event.target.id.split('_').pop();
+                    // D3LMap.tip.attr('class', 'd3-tip fade-out').show(d);
+                    D3LMap.tip.hide();
+                });
+        }
 
         var reset = function () { update(feature); };
 
